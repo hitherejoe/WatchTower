@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.hitherejoe.androidboilerplate" >
+    package="com.hitherejoe.proximityapidemo.android" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
-        android:name=".AndroidBoilerplateApplication"
+        android:name=".ProximityApiApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+                   android:value="AIzaSyB0uf7Gz1o0j9V2ih-JLPEXYPXZuBa_0BE"/>
+
         <activity
             android:name=".ui.activity.MainActivity"
             android:label="@string/app_name" >
@@ -19,6 +28,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.activity.PropertiesActivity"
+                  android:label="Update"/>
+        <activity android:name=".ui.activity.AttachmentsActivity"
+                  android:label="Attachments"/>
+        <activity android:name=".ui.activity.AddAttachmentActivity"
+                  android:label="Add Attachment"/>
+        <activity android:name=".ui.activity.DetailActivity"
+                  android:label="Beacon Detail"
+                  android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
