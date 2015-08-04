@@ -19,6 +19,7 @@ import java.util.List;
 import rx.Observable;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.openContextualActionModeOverflowMenu;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -78,7 +79,7 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
                 .check(matches(isDisplayed()));
     }
 
-    public void testAddAttachmentActivityStarted() {
+    public void testAddAttachmentActivityStarted() throws Exception {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         stubMockAttachments(beacon.beaconName, new ArrayList<Attachment>());
         List<Namespace> namespaces = MockModelsUtil.createMockListOfNamespaces(1);
@@ -96,6 +97,29 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
                 .perform(click());
         onView(withId(R.id.spinner_namespace))
                 .check(matches(isDisplayed()));
+    }
+
+    public void testDeleteAllAttachments() throws Exception {
+        Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
+        List<Attachment> attachments = MockModelsUtil.createMockListOfAttachments(beacon.beaconName, 10);
+        stubMockAttachments(beacon.beaconName, attachments);
+
+        ProximityApiService.AttachmentResponse attachmentResponse = new ProximityApiService.AttachmentResponse();
+        attachmentResponse.attachments = new ArrayList<>();
+
+        when(mProximityApiService.deleteBatchAttachments(beacon.beaconName))
+                .thenReturn(Observable.<Void>empty());
+
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
+        setActivityIntent(i);
+        getActivity();
+
+        when(mProximityApiService.getAttachments(beacon.beaconName, null))
+                .thenReturn(Observable.just(attachmentResponse));
+
+        openContextualActionModeOverflowMenu();
+        onView(withText(R.string.action_delete_all))
+                .perform(click());
     }
 
     private void checkAttachmentsDisplayOnRecyclerView(List<Attachment> beaconsToCheck) {
