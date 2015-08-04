@@ -8,21 +8,32 @@ import com.hitherejoe.proximityapidemo.android.data.model.Beacon;
 import com.hitherejoe.proximityapidemo.android.data.model.Diagnostics;
 import com.hitherejoe.proximityapidemo.android.ui.activity.AttachmentsActivity;
 import com.hitherejoe.proximityapidemo.android.ui.activity.DetailActivity;
+import com.hitherejoe.proximityapidemo.android.ui.activity.PropertiesActivity;
+import com.hitherejoe.proximityapidemo.android.ui.fragment.PropertiesFragment;
 import com.hitherejoe.proximityapidemo.android.util.MockModelsUtil;
 import com.hitherejoe.proximityapidemo.util.BaseTestCase;
 
+import java.util.ArrayList;
+
 import rx.Observable;
 
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class DetailActivityTest extends BaseTestCase<DetailActivity> {
@@ -231,6 +242,56 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
                 .check(matches(not(isDisplayed())));
         onView(withId(R.id.edit_text_place_id))
                 .check(matches(not(isDisplayed())));
+    }
+
+    public void testUpdateBeacon() throws Exception {
+        Beacon beacon = MockModelsUtil.createMockIncompleteBeacon();
+        Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
+
+        Diagnostics diagnostics = new Diagnostics();
+        diagnostics.alerts = new Diagnostics.Alert[0];
+        diagnostics.beaconName = "";
+        diagnostics.estimatedLowBatteryDate = null;
+
+        when(mProximityApiService.beaconDiagnostics(beacon.beaconName))
+                .thenReturn(Observable.just(diagnostics));
+        when(mProximityApiService.updateBeacon(anyString(), any(Beacon.class)))
+                .thenReturn(Observable.just(registeredBeacon));
+
+
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
+        setActivityIntent(i);
+        getActivity();
+
+        onView(withId(R.id.action_edit)).perform(click());
+
+        onView(withId(R.id.edit_text_description))
+                .perform(scrollTo(), typeText("New description"));
+
+        onView(withId(R.id.spinner_type)).perform(scrollTo(), click());
+        onData(allOf(is(instanceOf(String.class)), is("AltBeacon"))).check(matches(isDisplayed())).perform(click());
+
+        onView(withId(R.id.text_title_status))
+                .perform(scrollTo());
+        onView(withId(R.id.spinner_status)).perform(scrollTo(), click());
+        onData(allOf(is(instanceOf(String.class)), is("Active"))).check(matches(isDisplayed()));
+        onData(allOf(is(instanceOf(String.class)), is("Inactive"))).check(matches(isDisplayed())).perform(click());
+
+        onView(withId(R.id.text_title_stability))
+                .perform(scrollTo());
+        onView(withId(R.id.spinner_stability)).perform(scrollTo(), click());
+        onData(allOf(is(instanceOf(String.class)), is("Roving"))).check(matches(isDisplayed())).perform(click());
+
+        onView(withId(R.id.edit_text_latitude))
+                .perform(scrollTo(), typeText("-4.92344"));
+        onView(withId(R.id.edit_text_longitude))
+                .perform(scrollTo(), typeText("2.93784"));
+        onView(withId(R.id.edit_text_place_id))
+                .perform(scrollTo(), typeText("hbsj83hDHDB84635"));
+
+        onView(withId(R.id.action_done)).perform(click());
+        onView(withText(R.string.fragment_title_properties)).check(matches(isDisplayed()));
+        onView(withText(R.string.fragment_title_alerts)).check(matches(isDisplayed()));
     }
 
 }
