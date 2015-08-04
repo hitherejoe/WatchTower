@@ -118,6 +118,7 @@ public class AddAttachmentActivity extends BaseActivity {
         mProgressDialog.show();
         mSubscriptions.add(mDataManager.getNamespaces()
                 .subscribeOn(mDataManager.getScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ProximityApiService.NamespacesResponse>() {
                     @Override
                     public void onCompleted() {

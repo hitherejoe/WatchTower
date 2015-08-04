@@ -84,7 +84,7 @@ public interface ProximityApiService {
      * Delete a batch of attachments
      */
     @POST("/{beaconName}/attachments:batchDelete")
-    Observable<Void> deleteBatchAttachments(@Path(value="beaconName", encode=false) String beaconName);
+    Observable<Void> deleteBatchAttachments(@Path(value="beaconName", encode=false) String beaconName, @Query("namespacedType") String namespacedType);
 
     /**
      * Retrieve attachments

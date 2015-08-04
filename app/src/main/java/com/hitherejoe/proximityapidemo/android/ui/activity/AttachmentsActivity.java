@@ -2,6 +2,7 @@ package com.hitherejoe.proximityapidemo.android.ui.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -100,8 +101,11 @@ public class AttachmentsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_delete:
+                deleteAttachmentByType();
+                return true;
             case R.id.action_delete_all:
-                deleteAttachments();
+                deleteAttachments(null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -137,10 +141,22 @@ public class AttachmentsActivity extends BaseActivity {
         }
     }
 
-    private void deleteAttachments() {
-        mProgressDialog = DialogFactory.createProgressDialog(this, R.string.progress_dialog_deleting_all_attachments);
+    private void deleteAttachmentByType() {
+        DialogFactory.createInputDialog(this, getString(R.string.dialog_title_delete), getString(R.string.dialog_message_delete), new DialogFactory.DialogInputCallback() {
+            @Override
+            public String onInputSubmitted(String input) {
+                deleteAttachments(input);
+                return null;
+            }
+        }).show();
+    }
+
+    private void deleteAttachments(String type) {
+        mProgressDialog = DialogFactory.createProgressDialog(this,
+                type == null ? getString(R.string.progress_dialog_deleting_all_attachments)
+                        : getString(R.string.progress_dialog_deleting_type_attachments, type));
         mProgressDialog.show();
-        mSubscriptions.add(mDataManager.deleteBatchAttachments(mBeacon.beaconName)
+        mSubscriptions.add(mDataManager.deleteBatchAttachments(mBeacon.beaconName, type)
                 .subscribeOn(mDataManager.getScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ProximityApiService.AttachmentResponse>() {
@@ -151,9 +167,19 @@ public class AttachmentsActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "There was an error deleting all attachments " + e);
+                    public void onError(Throwable error) {
+                        Log.e(TAG, "There was an error deleting all attachments " + error);
                         mProgressDialog.dismiss();
+                        if (error instanceof RetrofitError) {
+                            DialogFactory.createRetrofitErrorDialog(
+                                    AttachmentsActivity.this,
+                                    (RetrofitError) error).show();
+                        } else {
+                            DialogFactory.createSimpleOkErrorDialog(
+                                    AttachmentsActivity.this,
+                                    getString(R.string.dialog_error_title),
+                                    getString(R.string.dialog_general_error_Message)).show();
+                        }
                     }
 
                     @Override
@@ -179,10 +205,20 @@ public class AttachmentsActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "There was an error retrieving the namespaces " + e);
+                    public void onError(Throwable error) {
+                        Log.e(TAG, "There was an error retrieving the namespaces " + error);
                         mProgressBar.setVisibility(View.GONE);
                         mSwipeRefresh.setRefreshing(false);
+                        if (error instanceof RetrofitError) {
+                            DialogFactory.createRetrofitErrorDialog(
+                                    AttachmentsActivity.this,
+                                    (RetrofitError) error).show();
+                        } else {
+                            DialogFactory.createSimpleOkErrorDialog(
+                                    AttachmentsActivity.this,
+                                    getString(R.string.dialog_error_title),
+                                    getString(R.string.dialog_general_error_Message)).show();
+                        }
                     }
 
                     @Override

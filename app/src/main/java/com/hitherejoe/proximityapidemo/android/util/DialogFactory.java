@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.StringRes;
+import android.text.InputType;
+import android.widget.EditText;
 
 import com.google.gson.Gson;
 import com.hitherejoe.proximityapidemo.android.R;
@@ -35,7 +38,29 @@ public class DialogFactory {
         return progressDialog;
     }
 
+    public static Dialog createInputDialog(Context context, String title, String message, final DialogInputCallback inputCallback) {
+        final EditText input = new EditText(context);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint(context.getString(R.string.dialog_hint_namespaced_type));
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(message)
+                .setView(input)
+                .setPositiveButton(context.getString(R.string.dialog_action_delete), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        inputCallback.onInputSubmitted(input.getText().toString());
+                    }
+                })
+                .setNegativeButton(context.getString(R.string.dialog_action_cancel), null);
+        return alertDialog.create();
+    }
+
     public static ProgressDialog createProgressDialog(Context context, @StringRes int messageResoruce) {
         return createProgressDialog(context, context.getString(messageResoruce));
+    }
+
+    public interface DialogInputCallback {
+        String onInputSubmitted(String input);
     }
 }

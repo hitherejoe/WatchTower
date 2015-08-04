@@ -6,6 +6,7 @@
     <string name="action_done">done</string>
     <string name="action_edit">edit</string>
     <string name="action_add_attachment">Add Attachment</string>
+    <string name="action_delete">Delete</string>
     <string name="action_delete_all">Delete all</string>
 
     <string name="text_view">View</string>
@@ -38,6 +39,12 @@
 
     <string name="error_advertised_id">Advertised Id is required</string>
     <string name="dialog_action_ok">OK</string>
+    <string name="dialog_action_delete">Delete</string>
+    <string name="dialog_action_cancel">Cancel</string>
+    <string name="dialog_hint_namespaced_type">Namespaced Type</string>
+
+    <string name="dialog_title_delete">Delete</string>
+    <string name="dialog_message_delete">Please enter a namespaced type</string>
 
     <string name="dialog_error_title">Oops</string>
     <string name="dialog_general_error_Message">There was an error making the request</string>
@@ -45,6 +52,7 @@
     <string name="progress_dialog_retrieving_namespaces">Retrieving namespaces&#8230;</string>
     <string name="progress_dialog_deleting_attachment">Deleting attachment&#8230;</string>
     <string name="progress_dialog_deleting_all_attachments">Deleting all attachments&#8230;</string>
+    <string name="progress_dialog_deleting_type_attachments">Deleting %s attachments&#8230;</string>
 
     <string-array name="statuses">
         <item>Select status</item>
