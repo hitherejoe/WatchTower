@@ -9,6 +9,7 @@ import com.hitherejoe.proximityapidemo.android.data.model.Attachment;
 import com.hitherejoe.proximityapidemo.android.data.model.Beacon;
 import com.hitherejoe.proximityapidemo.android.data.model.Namespace;
 import com.hitherejoe.proximityapidemo.android.data.remote.ProximityApiService;
+import com.hitherejoe.proximityapidemo.android.ui.activity.AddAttachmentActivity;
 import com.hitherejoe.proximityapidemo.android.ui.activity.AttachmentsActivity;
 import com.hitherejoe.proximityapidemo.android.util.MockModelsUtil;
 import com.hitherejoe.proximityapidemo.util.BaseTestCase;
@@ -18,13 +19,19 @@ import java.util.List;
 
 import rx.Observable;
 
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openContextualActionModeOverflowMenu;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
 public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
@@ -120,6 +127,41 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
         openContextualActionModeOverflowMenu();
         onView(withText(R.string.action_delete_all))
                 .perform(click());
+    }
+
+    public void testAddAttachmentValidInput() throws Exception {
+        Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
+        Attachment attachment = MockModelsUtil.createMockAttachment();
+        ProximityApiService.NamespacesResponse namespacesResponse = new ProximityApiService.NamespacesResponse();
+        namespacesResponse.namespaces = MockModelsUtil.createMockListOfNamespaces(1);
+
+        when(mProximityApiService.getNamespaces())
+                .thenReturn(Observable.just(namespacesResponse));
+
+        List<Attachment> attachments = MockModelsUtil.createMockListOfAttachments(beacon.beaconName, 10);
+        stubMockAttachments(beacon.beaconName, attachments);
+
+        ProximityApiService.AttachmentResponse attachmentResponse = new ProximityApiService.AttachmentResponse();
+        attachmentResponse.attachments = new ArrayList<>();
+
+        when(mProximityApiService.deleteBatchAttachments(beacon.beaconName))
+                .thenReturn(Observable.<Void>empty());
+
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
+        setActivityIntent(i);
+        getActivity();
+
+        when(mProximityApiService.createAttachment(beacon.beaconName, attachment))
+                .thenReturn(Observable.just(attachment));
+
+        onData(allOf(is(instanceOf(String.class)), is(namespacesResponse.namespaces.get(0).namespaceName)))
+                .check(matches(isDisplayed()));
+        onView(withId(R.id.edit_text_data))
+                .perform(typeText("Data"));
+        onView(withId(R.id.action_done))
+                .perform(click());
+        onView(withId(R.id.action_done))
+                .check(matches(not(isDisplayed())));
     }
 
     private void checkAttachmentsDisplayOnRecyclerView(List<Attachment> beaconsToCheck) {
