@@ -151,8 +151,13 @@ public class DataManager {
         return mProximityApiService.getNamespaces();
     }
 
-    public Observable<Void> deleteBatchAttachments(String beaconName, String namespacedType) {
-        return mProximityApiService.deleteBatchAttachments(beaconName);
+    public Observable<ProximityApiService.AttachmentResponse> deleteBatchAttachments(final String beaconName) {
+        return mProximityApiService.deleteBatchAttachments(beaconName).flatMap(new Func1<Void, Observable<ProximityApiService.AttachmentResponse>>() {
+            @Override
+            public Observable<ProximityApiService.AttachmentResponse> call(Void aVoid) {
+                return getAttachments(beaconName, null);
+            }
+        });
     }
 
 }

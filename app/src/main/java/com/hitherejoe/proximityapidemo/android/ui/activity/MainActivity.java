@@ -1,5 +1,6 @@
 package com.hitherejoe.proximityapidemo.android.ui.activity;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -73,14 +74,21 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         mSubscriptions = new CompositeSubscription();
         mDataManager = ProximityApiApplication.get().getDataManager();
         mEasyRecycleAdapter = new EasyRecyclerAdapter<>(this, BeaconHolder.class, mBeaconListener);
-        mBeaconsRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mBeaconsRecycler.setAdapter(mEasyRecycleAdapter);
-        //setupGoogleApiClient();
-        pickUserAccount();
-        //mGoogleApiClient.connect();
-        Log.d("ACCOUNT", AccountManager.KEY_ACCOUNT_NAME);
+        setupLayoutViews();
+        AccountManager manager = AccountManager.get(this);
+        Account[] accounts = manager.getAccountsByType("com.google");
+        final boolean connected = accounts != null && accounts.length > 0;
+        if (!connected) {
+            pickUserAccount();
+        } else {
+            getBeacons();
+        }
         ProximityApiApplication.get().getBus().register(this);
 
+    }
+    private void setupLayoutViews() {
+        mBeaconsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mBeaconsRecycler.setAdapter(mEasyRecycleAdapter);
         mSwipeRefresh.setColorSchemeResources(R.color.primary);
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -126,14 +134,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
 
     @Subscribe
     public void onBeaconChanged(BusEvent.BeaconListAmended event) {
-        Log.d("UPDATED", "Updated...");
         getBeacons();
-    }
-
-    private void setupGoogleApiClient() {
-        if (checkPlayServices()) {
-            //mGoogleApiClient = buildApiClient(this, this, this);
-        }
     }
 
     private boolean checkPlayServices() {
@@ -153,13 +154,10 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     @Override
     public void onConnected(Bundle connectionHint) {
         retrieveAuthToken();
-
-        Log.d("CONNECTED", "ON CONNECTED");
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        //mGoogleApiClient.connect();
     }
 
 

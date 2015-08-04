@@ -43,6 +43,13 @@ public class BeaconHolder extends ItemViewHolder<Beacon> {
 
     @Override
     public void onSetListeners() {
+        getView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BeaconListener beaconListener = getListener(BeaconListener.class);
+                if (beaconListener != null) beaconListener.onViewClicked(getItem());
+            }
+        });
         mAttachmentsText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
