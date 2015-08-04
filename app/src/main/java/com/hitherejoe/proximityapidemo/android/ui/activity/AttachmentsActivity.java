@@ -2,7 +2,6 @@ package com.hitherejoe.proximityapidemo.android.ui.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -53,10 +52,10 @@ public class AttachmentsActivity extends BaseActivity {
     @InjectView(R.id.swipe_refresh)
     SwipeRefreshLayout mSwipeRefresh;
 
-    private static final String TAG = "RegisterActivity";
+    private static final String TAG = "AttachmentsActivity";
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
-    private static final String EXTRA_BEACON = "con.hitherejoe.proximityapidemo.android.ui.activity.UpdateActivity.EXTRA_BEACON";
+    private static final String EXTRA_BEACON = "com.hitherejoe.proximityapidemo.android.ui.activity.UpdateActivity.EXTRA_BEACON";
     private Beacon mBeacon;
     private EasyRecyclerAdapter<Attachment> mEasyRecycleAdapter;
     private List<Attachment> mAttachments;
@@ -170,16 +169,7 @@ public class AttachmentsActivity extends BaseActivity {
                     public void onError(Throwable error) {
                         Log.e(TAG, "There was an error deleting all attachments " + error);
                         mProgressDialog.dismiss();
-                        if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(
-                                    AttachmentsActivity.this,
-                                    (RetrofitError) error).show();
-                        } else {
-                            DialogFactory.createSimpleOkErrorDialog(
-                                    AttachmentsActivity.this,
-                                    getString(R.string.dialog_error_title),
-                                    getString(R.string.dialog_general_error_Message)).show();
-                        }
+                        displayErrorDialog(error);
                     }
 
                     @Override
@@ -209,16 +199,7 @@ public class AttachmentsActivity extends BaseActivity {
                         Log.e(TAG, "There was an error retrieving the namespaces " + error);
                         mProgressBar.setVisibility(View.GONE);
                         mSwipeRefresh.setRefreshing(false);
-                        if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(
-                                    AttachmentsActivity.this,
-                                    (RetrofitError) error).show();
-                        } else {
-                            DialogFactory.createSimpleOkErrorDialog(
-                                    AttachmentsActivity.this,
-                                    getString(R.string.dialog_error_title),
-                                    getString(R.string.dialog_general_error_Message)).show();
-                        }
+                        displayErrorDialog(error);
                     }
 
                     @Override
@@ -251,16 +232,7 @@ public class AttachmentsActivity extends BaseActivity {
                     public void onError(Throwable error) {
                         Log.e(TAG, "There was an error deleting the attachment " + error);
                         mProgressDialog.dismiss();
-                        if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(
-                                    AttachmentsActivity.this,
-                                    (RetrofitError) error).show();
-                        } else {
-                            DialogFactory.createSimpleOkErrorDialog(
-                                    AttachmentsActivity.this,
-                                    getString(R.string.dialog_error_title),
-                                    getString(R.string.dialog_general_error_Message)).show();
-                        }
+                        displayErrorDialog(error);
                     }
 
                     @Override
@@ -275,6 +247,19 @@ public class AttachmentsActivity extends BaseActivity {
         } else {
             mAttachmentsRecycler.setVisibility(View.GONE);
             mNoAttachmentsText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void displayErrorDialog(Throwable error) {
+        if (error instanceof RetrofitError) {
+            DialogFactory.createRetrofitErrorDialog(
+                    AttachmentsActivity.this,
+                    (RetrofitError) error).show();
+        } else {
+            DialogFactory.createSimpleOkErrorDialog(
+                    AttachmentsActivity.this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_general_error_Message)).show();
         }
     }
 
