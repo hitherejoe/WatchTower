@@ -1,0 +1,53 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/text_namespace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Namespace"
+        android:textColor="@color/primary"
+        android:textStyle="bold"
+        android:textSize="15sp"/>
+
+    <Spinner
+        android:id="@+id/spinner_namespace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"/>
+
+    <TextView
+        android:id="@+id/text_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="4dp"
+        android:text="Data"
+        android:textColor="@color/primary"
+        android:textStyle="bold"
+        android:textSize="15sp"/>
+
+    <EditText
+        android:id="@+id/edit_text_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="@string/hint_data" />
+
+    <TextView
+        android:id="@+id/text_data_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:text="The attachment data cannot be blank"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="12sp"
+        android:visibility="invisible"/>
+
+</LinearLayout>

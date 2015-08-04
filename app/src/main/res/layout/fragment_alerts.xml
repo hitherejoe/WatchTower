@@ -1,0 +1,56 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/text_battery_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:padding="16dp"
+            android:text="@string/text_title_estimated_battery"
+            android:textColor="@color/primary"
+            android:textStyle="bold"
+            android:textSize="15sp"/>
+
+        <TextView
+            android:id="@+id/text_battery_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:padding="16dp"
+            android:text="@string/text_title_estimated_battery"
+            android:textColor="@color/primary"
+            android:textStyle="bold"
+            android:textSize="15sp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_alerts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_battery_title"
+            android:padding="16dp"
+            android:clipToPadding="false"/>
+
+        <ProgressBar
+            android:id="@+id/progress_indicator"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/text_no_alerts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/text_no_attachments"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+</ScrollView>

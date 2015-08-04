@@ -30,8 +30,11 @@
     <string name="hint_description">Description</string>
     <string name="hint_data">Data</string>
 
+    <string name="text_title_estimated_battery">Estimated Battery Date</string>
+
     <string name="text_no_beacons">Sorry, no beacons to display</string>
     <string name="text_no_attachments">Sorry, no attachments to display</string>
+    <string name="text_no_alerts">Sorry, no alerts to display</string>
 
     <string name="error_advertised_id">Advertised Id is required</string>
     <string name="dialog_action_ok">OK</string>
