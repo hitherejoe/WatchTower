@@ -42,9 +42,9 @@
     <string name="dialog_error_title">Oops</string>
     <string name="dialog_general_error_Message">There was an error making the request</string>
 
-    <string name="progress_dialog_retrieving_namespaces">Retrieving namespaces...</string>
-    <string name="progress_dialog_deleting_attachment">Deleting attachment...</string>
-    <string name="progress_dialog_deleting_all_attachments">Deleting all attachments...</string>
+    <string name="progress_dialog_retrieving_namespaces">Retrieving namespaces&#8230;</string>
+    <string name="progress_dialog_deleting_attachment">Deleting attachment&#8230;</string>
+    <string name="progress_dialog_deleting_all_attachments">Deleting all attachments&#8230;</string>
 
     <string-array name="statuses">
         <item>Select status</item>
