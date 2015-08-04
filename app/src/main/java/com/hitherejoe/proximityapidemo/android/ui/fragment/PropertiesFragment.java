@@ -135,8 +135,8 @@ public class PropertiesFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         if (mPropertiesMode == Mode.VIEW) ProximityApiApplication.get().getBus().unregister(this);
         mSubscriptions.unsubscribe();
     }

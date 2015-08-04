@@ -44,6 +44,7 @@
 
     <string name="progress_dialog_retrieving_namespaces">Retrieving namespaces...</string>
     <string name="progress_dialog_deleting_attachment">Deleting attachment...</string>
+    <string name="progress_dialog_deleting_all_attachments">Deleting all attachments...</string>
 
     <string-array name="statuses">
         <item>Select status</item>

@@ -138,22 +138,31 @@ public class AttachmentsActivity extends BaseActivity {
     }
 
     private void deleteAttachments() {
-        mSubscriptions.add(mDataManager.deleteBatchAttachments(mBeacon.beaconName, null)
+        mProgressDialog = DialogFactory.createProgressDialog(this, R.string.progress_dialog_deleting_all_attachments);
+        mProgressDialog.show();
+        mSubscriptions.add(mDataManager.deleteBatchAttachments(mBeacon.beaconName)
                 .subscribeOn(mDataManager.getScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Void>() {
+                .subscribe(new Subscriber<ProximityApiService.AttachmentResponse>() {
                     @Override
                     public void onCompleted() {
-                        retrieveAttachments();
+                        mProgressDialog.dismiss();
+                        handleViewVisibility();
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         Log.e(TAG, "There was an error deleting all attachments " + e);
+                        mProgressDialog.dismiss();
                     }
 
                     @Override
-                    public void onNext(Void aVoid) { }
+                    public void onNext(ProximityApiService.AttachmentResponse attachmentResponse) {
+                        mAttachments.clear();
+                        if (attachmentResponse.attachments != null) {
+                            mAttachments.addAll(attachmentResponse.attachments);
+                        }
+                    }
                 }));
     }
 
