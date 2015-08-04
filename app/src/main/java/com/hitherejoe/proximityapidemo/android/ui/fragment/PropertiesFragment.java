@@ -284,7 +284,7 @@ public class PropertiesFragment extends Fragment {
         Observable<Beacon> observable = mPropertiesMode == Mode.UPDATE ? mDataManager.updateBeacon(mBeacon.beaconName, beacon, hasStatusChanged, beacon.status) : mDataManager.registerBeacon(beacon);
         mSubscriptions.add(AppObservable.bindFragment(this,
                 observable)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<Beacon>() {
                     @Override
                     public void onCompleted() {
