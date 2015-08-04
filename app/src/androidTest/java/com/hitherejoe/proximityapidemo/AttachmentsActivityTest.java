@@ -32,6 +32,8 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
@@ -147,12 +149,14 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
         when(mProximityApiService.deleteBatchAttachments(beacon.beaconName))
                 .thenReturn(Observable.<Void>empty());
 
+        when(mProximityApiService.createAttachment(anyString(), any(Attachment.class)))
+                .thenReturn(Observable.just(attachment));
+
         Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
         setActivityIntent(i);
         getActivity();
 
-        when(mProximityApiService.createAttachment(beacon.beaconName, attachment))
-                .thenReturn(Observable.just(attachment));
+        onView(withId(R.id.fab_add)).perform(click());
 
         onData(allOf(is(instanceOf(String.class)), is(namespacesResponse.namespaces.get(0).namespaceName)))
                 .check(matches(isDisplayed()));
@@ -160,8 +164,7 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
                 .perform(typeText("Data"));
         onView(withId(R.id.action_done))
                 .perform(click());
-        onView(withId(R.id.action_done))
-                .check(matches(not(isDisplayed())));
+        onView(withId(R.id.fab_add)).check(matches(isDisplayed()));
     }
 
     private void checkAttachmentsDisplayOnRecyclerView(List<Attachment> beaconsToCheck) {
