@@ -78,11 +78,11 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         AccountManager manager = AccountManager.get(this);
         Account[] accounts = manager.getAccountsByType("com.google");
         final boolean connected = accounts != null && accounts.length > 0;
-        if (!connected) {
+       // if (!connected) {
             pickUserAccount();
-        } else {
-            getBeacons();
-        }
+       // } else {
+         //   getBeacons();
+       // }
         ProximityApiApplication.get().getBus().register(this);
 
     }

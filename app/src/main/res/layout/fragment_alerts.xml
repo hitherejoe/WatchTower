@@ -7,15 +7,11 @@
                     android:layout_height="wrap_content">
 
         <TextView
+            style="@style/TitleTextStyle"
             android:id="@+id/text_battery_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:padding="16dp"
-            android:text="@string/text_title_estimated_battery"
-            android:textColor="@color/primary"
-            android:textStyle="bold"
-            android:textSize="15sp"/>
+            android:text="@string/text_title_estimated_battery"/>
 
         <TextView
             android:id="@+id/text_battery_date"
@@ -25,31 +21,28 @@
             android:padding="16dp"
             android:text="@string/text_title_estimated_battery"
             android:textColor="@color/primary"
-            android:textStyle="bold"
-            android:textSize="15sp"/>
+            android:textSize="@dimen/text_body"
+            android:textStyle="bold"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_alerts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/text_battery_title"
-            android:padding="16dp"
-            android:clipToPadding="false"/>
+            android:clipToPadding="false"
+            android:padding="16dp"/>
 
         <ProgressBar
-            android:id="@+id/progress_indicator"
             style="?android:attr/progressBarStyleLarge"
+            android:id="@+id/progress_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
 
         <TextView
+            style="@style/EmptyListTextStyle"
             android:id="@+id/text_no_alerts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="@string/text_no_attachments"
-            android:visibility="gone"/>
+            android:text="@string/text_no_attachments"/>
 
     </RelativeLayout>
 

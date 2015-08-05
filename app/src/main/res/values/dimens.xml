@@ -9,5 +9,6 @@
     <dimen name="text_large_body">18sp</dimen>
     <dimen name="text_body">16sp</dimen>
     <dimen name="text_small_body">14sp</dimen>
+    <dimen name="text_smallest_body">12sp</dimen>
 
 </resources>

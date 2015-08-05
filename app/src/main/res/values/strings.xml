@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Proximity API Demo</string>
 
-    <string name="hello_world">Hello world!</string>
+    <!-- Options Menu -->
+
     <string name="action_about">About</string>
     <string name="action_done">done</string>
     <string name="action_edit">edit</string>
@@ -9,19 +10,32 @@
     <string name="action_delete">Delete</string>
     <string name="action_delete_all">Delete all</string>
 
+    <!-- Detail Activity -->
+
+    <string name="fragment_title_properties">Properties</string>
+    <string name="fragment_title_alerts">Alerts</string>
+
+    <!-- Beacon Card -->
+
     <string name="text_view">View</string>
     <string name="text_update">Update</string>
     <string name="text_attachments">Attachments</string>
+
+    <!-- Attachment Card -->
+
     <string name="text_delete">Delete</string>
 
-    <string name="text_label_status">Status</string>
-    <string name="text_label_type">Type</string>
+    <!-- Register / Updates / View Beacon -->
 
-    <string name="fragment_title_properties">Properties</string>
-    <string name="fragment_title_attachments">Attachments</string>
-    <string name="fragment_title_alerts">Alerts</string>
+    <string name="title_beacon_name">Beacon name</string>
+    <string name="title_advertised_id">Advertised ID</string>
+    <string name="title_description">Description</string>
+    <string name="title_type">Type</string>
+    <string name="title_status">Status</string>
+    <string name="title_stability">Stability</string>
+    <string name="title_location">Location</string>
+    <string name="title_places_id">Google Places ID</string>
 
-    <!-- Register beacons -->
     <string name="hint_beacon_name">Beacon name</string>
     <string name="hint_advertised_id">Advertised Id</string>
     <string name="hint_type">Type</string>
@@ -29,20 +43,34 @@
     <string name="hint_latitude">Latitude</string>
     <string name="hint_longitude">Longitude</string>
     <string name="hint_description">Description</string>
-    <string name="hint_data">Data</string>
+
+
+    <!-- Alerts -->
 
     <string name="text_title_estimated_battery">Estimated Battery Date</string>
+
+    <!-- Attachments -->
+
+    <string name="hint_data">Data</string>
+
+    <!-- Error Messages -->
 
     <string name="text_no_beacons">Sorry, no beacons to display</string>
     <string name="text_no_attachments">Sorry, no attachments to display</string>
     <string name="text_no_alerts">Sorry, no alerts to display</string>
 
+    <string name="error_message_advertised_id">The Advertised ID cannot be blank</string>
+    <string name="error_message_status">The beacon status cannot be blank</string>
+    <string name="error_message_attachment_data">The attachment data cannot be blank</string>
     <string name="error_advertised_id">Advertised Id is required</string>
+
+    <!-- Dialogs -->
+
     <string name="dialog_action_ok">OK</string>
     <string name="dialog_action_delete">Delete</string>
     <string name="dialog_action_cancel">Cancel</string>
-    <string name="dialog_hint_namespaced_type">Namespaced Type</string>
 
+    <string name="dialog_hint_namespaced_type">Namespaced Type</string>
     <string name="dialog_title_delete">Delete</string>
     <string name="dialog_message_delete">Please enter a namespaced type</string>
 
@@ -53,6 +81,12 @@
     <string name="progress_dialog_deleting_attachment">Deleting attachment&#8230;</string>
     <string name="progress_dialog_deleting_all_attachments">Deleting all attachments&#8230;</string>
     <string name="progress_dialog_deleting_type_attachments">Deleting %s attachments&#8230;</string>
+
+    <!-- Add Attachments Activity -->
+    <string name="text_title_namespace">Namespace</string>
+    <string name="text_title_data">Data</string>
+
+    <!-- Spinner Value Arrays -->
 
     <string-array name="statuses">
         <item>Select status</item>
