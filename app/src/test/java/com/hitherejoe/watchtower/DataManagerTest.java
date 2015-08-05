@@ -1,4 +1,4 @@
-package com.hitherejoe.proximityapidemo.android;
+package com.hitherejoe.watchtower;
 
 
 import com.hitherejoe.watchtower.data.DataManager;
@@ -12,7 +12,6 @@ import com.hitherejoe.watchtower.util.MockModelsUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
@@ -25,6 +24,7 @@ import rx.schedulers.Schedulers;
 
 import static com.hitherejoe.watchtower.util.RxAssertions.subscribeAssertingThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +39,7 @@ public class DataManagerTest {
     public void setUp() {
         mDataManager = new DataManager(RuntimeEnvironment.application, Schedulers.immediate());
         mWatchTowerService = mock(WatchTowerService.class);
-        mDataManager.setAndroidBoilerplateService(mWatchTowerService);
+        mDataManager.setWatchTowerService(mWatchTowerService);
     }
 
     @Test
@@ -181,7 +181,7 @@ public class DataManagerTest {
     public void shouldDeleteBatchAttachments() {
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
 
-        when(mWatchTowerService.deleteBatchAttachments(any(String.class)))
+        when(mWatchTowerService.deleteBatchAttachments(anyString(), anyString()))
                 .thenReturn(Observable.<Void>empty());
 
         subscribeAssertingThat(mDataManager.deleteBatchAttachments(registeredBeacon.beaconName, null))
