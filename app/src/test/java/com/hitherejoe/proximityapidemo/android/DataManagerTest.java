@@ -1,13 +1,13 @@
 package com.hitherejoe.proximityapidemo.android;
 
 
-import com.hitherejoe.proximityapidemo.android.data.DataManager;
-import com.hitherejoe.proximityapidemo.android.data.model.Attachment;
-import com.hitherejoe.proximityapidemo.android.data.model.Beacon;
-import com.hitherejoe.proximityapidemo.android.data.model.Namespace;
-import com.hitherejoe.proximityapidemo.android.data.remote.ProximityApiService;
-import com.hitherejoe.proximityapidemo.android.util.DefaultConfig;
-import com.hitherejoe.proximityapidemo.android.util.MockModelsUtil;
+import com.hitherejoe.watchtower.data.DataManager;
+import com.hitherejoe.watchtower.data.model.Attachment;
+import com.hitherejoe.watchtower.data.model.Beacon;
+import com.hitherejoe.watchtower.data.model.Namespace;
+import com.hitherejoe.watchtower.data.remote.WatchTowerService;
+import com.hitherejoe.watchtower.util.DefaultConfig;
+import com.hitherejoe.watchtower.util.MockModelsUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,7 @@ import java.util.List;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import static com.hitherejoe.proximityapidemo.android.util.RxAssertions.subscribeAssertingThat;
+import static com.hitherejoe.watchtower.util.RxAssertions.subscribeAssertingThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,20 +33,20 @@ import static org.mockito.Mockito.when;
 public class DataManagerTest {
 
     private DataManager mDataManager;
-    private ProximityApiService mProximityApiService;
+    private WatchTowerService mWatchTowerService;
 
     @Before
     public void setUp() {
         mDataManager = new DataManager(RuntimeEnvironment.application, Schedulers.immediate());
-        mProximityApiService = mock(ProximityApiService.class);
-        mDataManager.setAndroidBoilerplateService(mProximityApiService);
+        mWatchTowerService = mock(WatchTowerService.class);
+        mDataManager.setAndroidBoilerplateService(mWatchTowerService);
     }
 
     @Test
     public void shouldRegisterBeacon() {
         Beacon unregisteredBeacon = MockModelsUtil.createMockUnregisteredBeacon();
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
-        when(mProximityApiService.registerBeacon(unregisteredBeacon)).thenReturn(Observable.just(registeredBeacon));
+        when(mWatchTowerService.registerBeacon(unregisteredBeacon)).thenReturn(Observable.just(registeredBeacon));
         subscribeAssertingThat(mDataManager.registerBeacon(unregisteredBeacon))
                 .emits(registeredBeacon);
     }
@@ -56,11 +56,11 @@ public class DataManagerTest {
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
         Beacon registeredBeaconTwo = MockModelsUtil.createMockRegisteredBeacon();
         registeredBeaconTwo.beaconName = "FUCK";
-        ProximityApiService.BeaconsResponse beaconsResponse = new ProximityApiService.BeaconsResponse();
+        WatchTowerService.BeaconsResponse beaconsResponse = new WatchTowerService.BeaconsResponse();
         beaconsResponse.beacons = new ArrayList<>();
         beaconsResponse.beacons.add(registeredBeacon);
         beaconsResponse.beacons.add(registeredBeaconTwo);
-        when(mProximityApiService.getBeacons()).thenReturn(Observable.just(beaconsResponse));
+        when(mWatchTowerService.getBeacons()).thenReturn(Observable.just(beaconsResponse));
 
         subscribeAssertingThat(mDataManager.getBeacons())
                 .emits(beaconsResponse.beacons);
@@ -72,7 +72,7 @@ public class DataManagerTest {
         Beacon updatedBeacon = MockModelsUtil.createMockRegisteredBeacon();
         updatedBeacon.description = "Desc";
 
-        when(mProximityApiService.updateBeacon(registeredBeacon.beaconName, updatedBeacon))
+        when(mWatchTowerService.updateBeacon(registeredBeacon.beaconName, updatedBeacon))
                 .thenReturn(Observable.just(updatedBeacon));
 
         subscribeAssertingThat(mDataManager.updateBeacon(registeredBeacon.beaconName, updatedBeacon, false, Beacon.Status.ACTIVE))
@@ -88,9 +88,9 @@ public class DataManagerTest {
         Beacon decommissionedBeacon = MockModelsUtil.createMockRegisteredBeacon();
         decommissionedBeacon.status = Beacon.Status.DECOMMISSIONED;
 
-        when(mProximityApiService.decomissionBeacon(decommissionedBeacon.beaconName))
+        when(mWatchTowerService.decomissionBeacon(decommissionedBeacon.beaconName))
                 .thenReturn(Observable.just(decommissionedBeacon));
-        when(mProximityApiService.getBeacon(decommissionedBeacon.beaconName))
+        when(mWatchTowerService.getBeacon(decommissionedBeacon.beaconName))
                 .thenReturn(Observable.just(decommissionedBeacon));
         subscribeAssertingThat(mDataManager.setBeaconStatus(decommissionedBeacon, Beacon.Status.DECOMMISSIONED))
                 .emits(decommissionedBeacon);
@@ -98,9 +98,9 @@ public class DataManagerTest {
         Beacon inactiveBeacon = MockModelsUtil.createMockRegisteredBeacon();
         inactiveBeacon.status = Beacon.Status.INACTIVE;
 
-        when(mProximityApiService.deactivateBeacon(inactiveBeacon.beaconName))
+        when(mWatchTowerService.deactivateBeacon(inactiveBeacon.beaconName))
                 .thenReturn(Observable.just(inactiveBeacon));
-        when(mProximityApiService.getBeacon(inactiveBeacon.beaconName))
+        when(mWatchTowerService.getBeacon(inactiveBeacon.beaconName))
                 .thenReturn(Observable.just(inactiveBeacon));
         subscribeAssertingThat(mDataManager.setBeaconStatus(inactiveBeacon, Beacon.Status.INACTIVE))
                 .emits(inactiveBeacon);
@@ -108,9 +108,9 @@ public class DataManagerTest {
         Beacon activeBeacon = MockModelsUtil.createMockRegisteredBeacon();
         activeBeacon.status = Beacon.Status.ACTIVE;
 
-        when(mProximityApiService.activateBeacon(activeBeacon.beaconName))
+        when(mWatchTowerService.activateBeacon(activeBeacon.beaconName))
                 .thenReturn(Observable.just(activeBeacon));
-        when(mProximityApiService.getBeacon(activeBeacon.beaconName))
+        when(mWatchTowerService.getBeacon(activeBeacon.beaconName))
                 .thenReturn(Observable.just(activeBeacon));
         subscribeAssertingThat(mDataManager.setBeaconStatus(activeBeacon, Beacon.Status.ACTIVE))
                 .emits(activeBeacon);
@@ -123,7 +123,7 @@ public class DataManagerTest {
         Attachment registeredAttachment = MockModelsUtil.createMockAttachment();
         registeredAttachment.attachmentName = "attachmentName";
 
-        when(mProximityApiService.createAttachment(registeredBeacon.beaconName, unRegisteredAttachment))
+        when(mWatchTowerService.createAttachment(registeredBeacon.beaconName, unRegisteredAttachment))
                 .thenReturn(Observable.just(registeredAttachment));
         subscribeAssertingThat(mDataManager.createAttachment(registeredBeacon.beaconName, unRegisteredAttachment))
                 .emits(registeredAttachment);
@@ -134,7 +134,7 @@ public class DataManagerTest {
         Attachment registeredAttachment = MockModelsUtil.createMockAttachment();
         registeredAttachment.attachmentName = "attachmentName";
 
-        when(mProximityApiService.deleteAttachment(registeredAttachment.attachmentName))
+        when(mWatchTowerService.deleteAttachment(registeredAttachment.attachmentName))
                 .thenReturn(Observable.<Void>empty());
         subscribeAssertingThat(mDataManager.deleteAttachment(registeredAttachment.attachmentName))
                 .completesSuccessfully();
@@ -151,10 +151,10 @@ public class DataManagerTest {
         attachments.add(registeredAttachmentOne);
         attachments.add(registeredAttachmentTwo);
 
-        ProximityApiService.AttachmentResponse attachmentResponse = new ProximityApiService.AttachmentResponse();
+        WatchTowerService.AttachmentResponse attachmentResponse = new WatchTowerService.AttachmentResponse();
         attachmentResponse.attachments = attachments;
 
-        when(mProximityApiService.getAttachments(any(String.class), any(String.class)))
+        when(mWatchTowerService.getAttachments(any(String.class), any(String.class)))
                 .thenReturn(Observable.just(attachmentResponse));
 
         subscribeAssertingThat(mDataManager.getAttachments(registeredBeacon.beaconName, null))
@@ -167,10 +167,10 @@ public class DataManagerTest {
         List<Namespace> namespaces = new ArrayList<>();
         namespaces.add(namespace);
 
-        ProximityApiService.NamespacesResponse namespacesResponse = new ProximityApiService.NamespacesResponse();
+        WatchTowerService.NamespacesResponse namespacesResponse = new WatchTowerService.NamespacesResponse();
         namespacesResponse.namespaces = namespaces;
 
-        when(mProximityApiService.getNamespaces())
+        when(mWatchTowerService.getNamespaces())
                 .thenReturn(Observable.just(namespacesResponse));
 
         subscribeAssertingThat(mDataManager.getNamespaces())
@@ -181,7 +181,7 @@ public class DataManagerTest {
     public void shouldDeleteBatchAttachments() {
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
 
-        when(mProximityApiService.deleteBatchAttachments(any(String.class)))
+        when(mWatchTowerService.deleteBatchAttachments(any(String.class)))
                 .thenReturn(Observable.<Void>empty());
 
         subscribeAssertingThat(mDataManager.deleteBatchAttachments(registeredBeacon.beaconName, null))

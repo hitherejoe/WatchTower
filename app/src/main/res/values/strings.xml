@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Proximity API Demo</string>
+    <string name="app_name">WatchTower</string>
 
     <!-- Options Menu -->
 
@@ -83,6 +83,7 @@
     <string name="progress_dialog_deleting_type_attachments">Deleting %s attachments&#8230;</string>
 
     <!-- Add Attachments Activity -->
+
     <string name="text_title_namespace">Namespace</string>
     <string name="text_title_data">Data</string>
 

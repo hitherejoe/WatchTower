@@ -1,4 +1,4 @@
-package com.hitherejoe.proximityapidemo.android.util;
+package com.hitherejoe.watchtower.util;
 
 import junit.framework.AssertionFailedError;
 

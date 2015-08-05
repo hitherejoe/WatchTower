@@ -1,4 +1,4 @@
-package com.hitherejoe.proximityapidemo.android.util;
+package com.hitherejoe.watchtower.util;
 
 public class DefaultConfig {
     //The api level that Roboelectric will use to run the unit tests
