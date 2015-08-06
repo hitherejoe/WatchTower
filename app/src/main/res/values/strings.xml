@@ -52,6 +52,7 @@
 
     <string name="text_title_estimated_battery">Est. Low Battery</string>
     <string name="text_title_alerts">Alerts</string>
+    <string name="text_battery_unknown">Unknown</string>
 
     <!-- Attachments -->
 

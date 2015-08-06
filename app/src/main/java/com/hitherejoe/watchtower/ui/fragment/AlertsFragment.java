@@ -51,7 +51,6 @@ public class AlertsFragment extends Fragment {
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
     private Diagnostics mDiagnostics;
-    private Diagnostics.Alert[] mAlerts;
     private EasyRecyclerAdapter<Diagnostics.Alert> mEasyRecycleAdapter;
 
     public static AlertsFragment newInstance(Beacon beacon) {
@@ -103,11 +102,9 @@ public class AlertsFragment extends Fragment {
                         mProgressBar.setVisibility(View.GONE);
                         if (mDiagnostics != null) {
                             if (mDiagnostics.estimatedLowBatteryDate != null) {
-                                mBatteryTitleText.setVisibility(View.VISIBLE);
                                 mBatteryDateText.setText(mDiagnostics.estimatedLowBatteryDate.buildDate());
                             } else {
-                                mBatteryDateText.setVisibility(View.GONE);
-                                mBatteryTitleText.setVisibility(View.GONE);
+                                mBatteryDateText.setText(getString(R.string.text_battery_unknown));
                             }
                             if (mDiagnostics.alerts != null
                                     && mDiagnostics.alerts.length > 0) {
