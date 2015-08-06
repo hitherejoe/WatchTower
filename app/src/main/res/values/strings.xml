@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">WatchTower</string>
 
+    <string name="label_update">Update</string>
+    <string name="label_register">Register</string>
+
     <!-- Options Menu -->
 
     <string name="action_about">About</string>
@@ -47,7 +50,8 @@
 
     <!-- Alerts -->
 
-    <string name="text_title_estimated_battery">Estimated Battery Date</string>
+    <string name="text_title_estimated_battery">Est. Low Battery</string>
+    <string name="text_title_alerts">Alerts</string>
 
     <!-- Attachments -->
 

@@ -25,6 +25,7 @@ import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.DialogFactory;
 import com.squareup.otto.Subscribe;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -261,8 +262,7 @@ public class PropertiesFragment extends Fragment {
         AdvertisedId id = new AdvertisedId();
         boolean hasStatusChanged = false;
         if (mPropertiesMode == Mode.UPDATE) hasStatusChanged = beacon.status != mBeacon.status;
-        String advertisedId = mAdvertisedIdEditText.getText().toString();
-        id.id = DataUtils.base64Encode(advertisedId.getBytes());
+        id.id =  mAdvertisedIdEditText.getText().toString();
         if (beaconTypeSpinner.getSelectedItemPosition() > 0) id.type = AdvertisedId.Type.fromString(beaconTypeSpinner.getSelectedItem().toString());
         beacon.advertisedId = id;
         LatLng latLng = new LatLng();

@@ -42,13 +42,18 @@ public class PropertiesActivity extends BaseActivity {
         if (mode == null) throw new IllegalArgumentException(TAG + ": Beacon is required!");
         Beacon beacon = getIntent().getParcelableExtra(EXTRA_BEACON);
         if (mode == PropertiesFragment.Mode.UPDATE && beacon == null) throw new IllegalArgumentException(TAG + ": Beacon is required!");
-        setupActionBar();
+        setupActionBar(mode);
         addFragment(beacon, mode);
     }
 
-    private void setupActionBar() {
+    private void setupActionBar(Mode mode) {
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(mode == Mode.REGISTER
+                    ? getString(R.string.label_register)
+                    : getString(R.string.label_update));
+        }
     }
 
     private void addFragment(Beacon beacon, Mode mode) {

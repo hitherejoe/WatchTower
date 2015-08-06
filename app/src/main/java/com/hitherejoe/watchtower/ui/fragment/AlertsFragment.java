@@ -2,6 +2,7 @@ package com.hitherejoe.watchtower.ui.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,9 @@ import com.hitherejoe.watchtower.WatchTowerApplication;
 import com.hitherejoe.watchtower.data.DataManager;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Diagnostics;
+import com.hitherejoe.watchtower.ui.adapter.AlertHolder;
+
+import java.util.Arrays;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -22,6 +26,7 @@ import rx.Subscriber;
 import rx.android.app.AppObservable;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
+import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
 public class AlertsFragment extends Fragment {
 
@@ -34,12 +39,17 @@ public class AlertsFragment extends Fragment {
     @InjectView(R.id.progress_indicator)
     ProgressBar mProgressBar;
 
+    @InjectView(R.id.text_battery_date)
+    TextView mBatteryDateText;
+
     private static final String EXTRA_BEACON = "EXTRA_BEACON";
     private static final String TAG = "AlertsFragment";
     private Beacon mBeacon;
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
     private Diagnostics mDiagnostics;
+    private Diagnostics.Alert[] mAlerts;
+    private EasyRecyclerAdapter<Diagnostics.Alert> mEasyRecycleAdapter;
 
     public static AlertsFragment newInstance(Beacon beacon) {
         AlertsFragment propertiesFragment = new AlertsFragment();
@@ -53,9 +63,10 @@ public class AlertsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBeacon = getArguments().getParcelable(EXTRA_BEACON);
-        if (mBeacon == null) throw new IllegalArgumentException("Properties fragment requires a beacon!");
+        if (mBeacon == null) throw new IllegalArgumentException("Alerts fragment requires a beacon instance!");
         mSubscriptions = new CompositeSubscription();
         mDataManager = WatchTowerApplication.get().getDataManager();
+        mEasyRecycleAdapter = new EasyRecyclerAdapter<>(getActivity(), AlertHolder.class);
         setHasOptionsMenu(true);
     }
 
@@ -63,14 +74,20 @@ public class AlertsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_alerts, container, false);
         ButterKnife.inject(this, fragmentView);
+        setupRecyclerView();
         getDiagnostics();
         return fragmentView;
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         mSubscriptions.unsubscribe();
+    }
+
+    private void setupRecyclerView() {
+        mAlertsRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mAlertsRecycler.setAdapter(mEasyRecycleAdapter);
     }
 
     private void getDiagnostics() {
@@ -81,11 +98,19 @@ public class AlertsFragment extends Fragment {
                     @Override
                     public void onCompleted() {
                         mProgressBar.setVisibility(View.GONE);
-                        if (mDiagnostics != null
-                                && mDiagnostics.alerts.length > 0) {
-                            mNoAttachmentsText.setVisibility(View.GONE);
-                        } else {
-
+                        if (mDiagnostics != null) {
+                            if (mDiagnostics.estimatedLowBatteryDate != null) {
+                                mBatteryDateText.setText(mDiagnostics.estimatedLowBatteryDate.buildDate());
+                            }
+                            if (mDiagnostics.alerts != null
+                                    && mDiagnostics.alerts.length > 0) {
+                                mEasyRecycleAdapter.addItems(Arrays.asList(mDiagnostics.alerts));
+                                mNoAttachmentsText.setVisibility(View.GONE);
+                                mAlertsRecycler.setVisibility(View.VISIBLE);
+                            } else {
+                                mNoAttachmentsText.setVisibility(View.VISIBLE);
+                                mAlertsRecycler.setVisibility(View.GONE);
+                            }
                         }
                     }
 
@@ -93,12 +118,10 @@ public class AlertsFragment extends Fragment {
                     public void onError(Throwable e) {
                         mProgressBar.setVisibility(View.GONE);
                         Log.e(TAG, "There was an error retrieving the beacon diagnostics " + e);
-                        e.printStackTrace();
                     }
 
                     @Override
                     public void onNext(Diagnostics diagnostics) {
-                        Log.d("DIAGNOSTICS", diagnostics.beaconName);
                         mDiagnostics = diagnostics;
                     }
                 }));

@@ -8,9 +8,13 @@ public class Diagnostics {
     public BeaconDate estimatedLowBatteryDate;
     public Alert[] alerts;
 
-    public class BeaconDate {
+    public static class BeaconDate {
         public int year;
         public int month;
         public int day;
+
+        public String buildDate() {
+            return String.format("%d/%d/%d", this.day, this.month, this.year);
+        }
     }
 }

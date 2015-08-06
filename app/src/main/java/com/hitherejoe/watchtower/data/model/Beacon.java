@@ -78,6 +78,65 @@ public class Beacon implements Parcelable {
         }
     }
 
+    private Beacon (BeaconBuilder builder) {
+        this.advertisedId  = builder.advertisedId;
+        this.beaconName = builder.beaconName;
+        this.status = builder.status;
+        this.expectedStability = builder.expectedStability;
+        this.latLng = builder.latLng;
+        this.description = builder.description;
+        this.placeId = builder.placeId;
+    }
+
+    public static class BeaconBuilder {
+        private AdvertisedId advertisedId;
+        private String beaconName;
+        private Status status;
+        private Stability expectedStability;
+        private LatLng latLng;
+        private String description;
+        private String placeId;
+
+        public BeaconBuilder(AdvertisedId advertisedId) {
+            this.advertisedId = advertisedId;
+        }
+
+        public BeaconBuilder beaconName(String beaconName) {
+            this.beaconName = beaconName;
+            return this;
+        }
+
+        public BeaconBuilder status(Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public BeaconBuilder stability(Stability stability) {
+            this.expectedStability = stability;
+            return this;
+        }
+
+        public BeaconBuilder latLng(LatLng latLng) {
+            this.latLng = latLng;
+            return this;
+        }
+
+        public BeaconBuilder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public BeaconBuilder placeId(String placeId) {
+            this.placeId = placeId;
+            return this;
+        }
+
+        public Beacon build() {
+            return new Beacon(this);
+        }
+
+    }
+
     @Override
     public int describeContents() {
         return 0;
