@@ -4,9 +4,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.hitherejoe.watchtower.R;
-import com.hitherejoe.watchtower.data.model.Attachment;
 import com.hitherejoe.watchtower.data.model.Diagnostics;
-import com.hitherejoe.watchtower.util.DataUtils;
 
 import uk.co.ribot.easyadapter.ItemViewHolder;
 import uk.co.ribot.easyadapter.PositionInfo;

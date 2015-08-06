@@ -103,7 +103,41 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
 
         onView(withText(R.string.fragment_title_alerts)).perform(click());
         onView(withId(R.id.text_battery_title)).check(matches(isDisplayed()));
-        //TODO: Finish writing test when fragment implemented fully
+        onView(withId(R.id.text_title_alerts)).check(matches(isDisplayed()));
+    }
+
+    public void testDiagnosticsInformationDisplayed() {
+        Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
+        Diagnostics diagnostics = MockModelsUtil.createMockDiagnostics(beacon.beaconName);
+
+        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+                .thenReturn(Observable.just(diagnostics));
+        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
+        setActivityIntent(i);
+        getActivity();
+
+        onView(withText(R.string.fragment_title_alerts)).perform(click());
+        onView(withText(R.string.text_title_estimated_battery)).check(matches(isDisplayed()));
+        onView(withText(diagnostics.estimatedLowBatteryDate.buildDate())).check(matches(isDisplayed()));
+        for (Diagnostics.Alert alert : diagnostics.alerts) {
+            onView(withText(alert.toString())).check(matches(isDisplayed()));
+        }
+    }
+
+    public void testDiagnosticsPlaceholdersDisplayed() {
+        Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
+        Diagnostics diagnostics = MockModelsUtil.createMockEmptyDiagnostics(beacon.beaconName);
+
+        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+                .thenReturn(Observable.just(diagnostics));
+        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
+        setActivityIntent(i);
+        getActivity();
+
+        onView(withText(R.string.fragment_title_alerts)).perform(click());
+        onView(withText(R.string.text_title_estimated_battery)).check(matches(isDisplayed()));
+        onView(withText(R.string.text_battery_unknown)).check(matches(isDisplayed()));
+        onView(withText(R.string.text_no_alerts)).check(matches(isDisplayed()));
     }
 
     public void testViewBeaconCompleteForm() throws Exception {

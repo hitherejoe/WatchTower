@@ -16,7 +16,7 @@
     <!-- Detail Activity -->
 
     <string name="fragment_title_properties">Properties</string>
-    <string name="fragment_title_alerts">Alerts</string>
+    <string name="fragment_title_alerts">Diagnostics</string>
 
     <!-- Beacon Card -->
 

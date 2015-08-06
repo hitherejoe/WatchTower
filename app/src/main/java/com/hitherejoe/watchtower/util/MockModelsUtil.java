@@ -3,11 +3,13 @@ package com.hitherejoe.watchtower.util;
 import com.hitherejoe.watchtower.data.model.AdvertisedId;
 import com.hitherejoe.watchtower.data.model.Attachment;
 import com.hitherejoe.watchtower.data.model.Beacon;
+import com.hitherejoe.watchtower.data.model.Diagnostics;
 import com.hitherejoe.watchtower.data.model.LatLng;
 import com.hitherejoe.watchtower.data.model.Namespace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class MockModelsUtil {
@@ -58,6 +60,27 @@ public class MockModelsUtil {
         namespace.namespaceName = "proximity-api";
         namespace.servingVisibility = Namespace.Visibility.PUBLIC;
         return namespace;
+    }
+
+    public static Diagnostics createMockDiagnostics(String beaconName) {
+        Diagnostics diagnostics = new Diagnostics();
+        diagnostics.beaconName = beaconName;
+        Diagnostics.BeaconDate beaconDate = new Diagnostics.BeaconDate();
+        Random random = new Random();
+        beaconDate.day = random.nextInt(30);
+        beaconDate.month = random.nextInt(12);
+        beaconDate.year = random.nextInt(9999);
+        diagnostics.estimatedLowBatteryDate = beaconDate;
+        diagnostics.alerts = new Diagnostics.Alert[2];
+        diagnostics.alerts[0] = Diagnostics.Alert.LOW_BATTERY;
+        diagnostics.alerts[1] = Diagnostics.Alert.WRONG_LOCATION;
+        return diagnostics;
+    }
+
+    public static Diagnostics createMockEmptyDiagnostics(String beaconName) {
+        Diagnostics diagnostics = new Diagnostics();
+        diagnostics.beaconName = beaconName;
+        return diagnostics;
     }
 
     public static List<Namespace> createMockListOfNamespaces(int num) {
