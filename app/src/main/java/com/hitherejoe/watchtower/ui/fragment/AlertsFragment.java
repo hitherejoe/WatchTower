@@ -42,6 +42,9 @@ public class AlertsFragment extends Fragment {
     @InjectView(R.id.text_battery_date)
     TextView mBatteryDateText;
 
+    @InjectView(R.id.text_battery_title)
+    TextView mBatteryTitleText;
+
     private static final String EXTRA_BEACON = "EXTRA_BEACON";
     private static final String TAG = "AlertsFragment";
     private Beacon mBeacon;
@@ -100,7 +103,11 @@ public class AlertsFragment extends Fragment {
                         mProgressBar.setVisibility(View.GONE);
                         if (mDiagnostics != null) {
                             if (mDiagnostics.estimatedLowBatteryDate != null) {
+                                mBatteryTitleText.setVisibility(View.VISIBLE);
                                 mBatteryDateText.setText(mDiagnostics.estimatedLowBatteryDate.buildDate());
+                            } else {
+                                mBatteryDateText.setVisibility(View.GONE);
+                                mBatteryTitleText.setVisibility(View.GONE);
                             }
                             if (mDiagnostics.alerts != null
                                     && mDiagnostics.alerts.length > 0) {
