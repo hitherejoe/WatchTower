@@ -15,6 +15,7 @@ import com.hitherejoe.watchtower.WatchTowerApplication;
 import com.hitherejoe.watchtower.data.DataManager;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Diagnostics;
+import com.hitherejoe.watchtower.data.model.Diagnostics.Alert;
 import com.hitherejoe.watchtower.ui.adapter.AlertHolder;
 import com.hitherejoe.watchtower.util.DialogFactory;
 
@@ -25,7 +26,6 @@ import butterknife.ButterKnife;
 import retrofit.RetrofitError;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
@@ -46,10 +46,10 @@ public class AlertsFragment extends Fragment {
 
     private static final String EXTRA_BEACON = "EXTRA_BEACON";
     private Beacon mBeacon;
-    private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
+    private DataManager mDataManager;
     private Diagnostics mDiagnostics;
-    private EasyRecyclerAdapter<Diagnostics.Alert> mEasyRecycleAdapter;
+    private EasyRecyclerAdapter<Alert> mEasyRecycleAdapter;
 
     public static AlertsFragment newInstance(Beacon beacon) {
         AlertsFragment propertiesFragment = new AlertsFragment();
@@ -119,7 +119,7 @@ public class AlertsFragment extends Fragment {
                     @Override
                     public void onError(Throwable error) {
                         mProgressBar.setVisibility(View.GONE);
-                        Timber.e("There was an error retrieving the beacon diagnostics " + error);
+                        Timber.e("There was an error retrieving beacon diagnostics " + error);
                         if (error instanceof RetrofitError) {
                             DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error);
                         } else {

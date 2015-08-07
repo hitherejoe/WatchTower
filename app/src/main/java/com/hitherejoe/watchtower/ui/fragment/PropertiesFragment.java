@@ -1,5 +1,7 @@
 package com.hitherejoe.watchtower.ui.fragment;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -40,15 +42,6 @@ import timber.log.Timber;
 
 public class PropertiesFragment extends Fragment {
 
-    @Bind(R.id.spinner_status)
-    Spinner beaconStatusSpinner;
-
-    @Bind(R.id.spinner_type)
-    Spinner beaconTypeSpinner;
-
-    @Bind(R.id.spinner_stability)
-    Spinner beaconStabilitySpinner;
-
     @Bind(R.id.edit_text_beacon_name)
     EditText mBeaconNameEditText;
 
@@ -66,6 +59,15 @@ public class PropertiesFragment extends Fragment {
 
     @Bind(R.id.edit_text_place_id)
     EditText mPlaceIdEditText;
+
+    @Bind(R.id.spinner_status)
+    Spinner mBeaconStatusSpinner;
+
+    @Bind(R.id.spinner_type)
+    Spinner mBeaconTypeSpinner;
+
+    @Bind(R.id.spinner_stability)
+    Spinner mBeaconStabilitySpinner;
 
     @Bind(R.id.text_title_beacon_name)
     TextView mBeaconNameText;
@@ -93,10 +95,11 @@ public class PropertiesFragment extends Fragment {
 
     private static final String EXTRA_MODE = "EXTRA_MODE";
     private static final String EXTRA_BEACON = "EXTRA_BEACON";
-    private Mode mPropertiesMode;
     private Beacon mBeacon;
-    private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
+    private DataManager mDataManager;
+    private Mode mPropertiesMode;
+    private ProgressDialog mProgressDialog;
 
     public enum Mode { VIEW, REGISTER, UPDATE }
 
@@ -126,11 +129,8 @@ public class PropertiesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_properties, container, false);
         ButterKnife.bind(this, fragmentView);
-        setupFragment();
-        if (mPropertiesMode == Mode.UPDATE || mPropertiesMode == Mode.VIEW) {
-            disableViewInteration();
-            setupBeaconForm();
-        }
+        disableFormFields();
+        if (mPropertiesMode != Mode.REGISTER) populateBeaconForm();
         return fragmentView;
     }
 
@@ -161,47 +161,40 @@ public class PropertiesFragment extends Fragment {
     @Subscribe
     public void onBeaconUpdated(BusEvent.BeaconUpdated event) {
         mBeacon = event.beacon;
-        setupBeaconForm();
+        populateBeaconForm();
     }
 
-    private void setupFragment() {
-        if (mPropertiesMode == Mode.REGISTER) {
-            mBeaconNameText.setVisibility(View.GONE);
-            mBeaconNameEditText.setVisibility(View.GONE);
-        }
-    }
-
-    private void disableViewInteration() {
-        mBeaconNameEditText.setInputType(0);
-        mBeaconNameEditText.setFocusable(false);
-        mBeaconNameEditText.setBackground(null);
-        mAdvertisedIdEditText.setInputType(0);
-        mAdvertisedIdEditText.setFocusable(false);
-        mAdvertisedIdEditText.setBackground(null);
+    private void disableFormFields() {
         if (mPropertiesMode == Mode.VIEW) {
-            mDescriptionEditText.setInputType(0);
-            mDescriptionEditText.setFocusable(false);
-            mDescriptionEditText.setBackground(null);
-            mLatitudeEditText.setInputType(0);
-            mLatitudeEditText.setFocusable(false);
-            mLatitudeEditText.setBackground(null);
-            mLongitudeEditText.setInputType(0);
-            mLongitudeEditText.setFocusable(false);
-            mLongitudeEditText.setBackground(null);
-            mPlaceIdEditText.setInputType(0);
-            mPlaceIdEditText.setFocusable(false);
-            mPlaceIdEditText.setBackground(null);
-            beaconStatusSpinner.setEnabled(false);
-            beaconTypeSpinner.setEnabled(false);
-            beaconStabilitySpinner.setEnabled(false);
+            displayTextFieldAsReadOnly(mDescriptionEditText);
+            displayTextFieldAsReadOnly(mLatitudeEditText);
+            displayTextFieldAsReadOnly(mLongitudeEditText);
+            displayTextFieldAsReadOnly(mPlaceIdEditText);
+            mBeaconStatusSpinner.setEnabled(false);
+            mBeaconTypeSpinner.setEnabled(false);
+            mBeaconStabilitySpinner.setEnabled(false);
             mAdvertisedIdErrorMessage.setVisibility(View.GONE);
             mStatusErrorMessage.setVisibility(View.GONE);
         }
+        if (mPropertiesMode == Mode.REGISTER) {
+            mBeaconNameText.setVisibility(View.GONE);
+            mBeaconNameEditText.setVisibility(View.GONE);
+        } else if (mPropertiesMode == Mode.UPDATE) {
+            displayTextFieldAsReadOnly(mBeaconNameEditText);
+            displayTextFieldAsReadOnly(mAdvertisedIdEditText);
+        }
     }
 
-    private void setupBeaconForm() {
+    private void displayTextFieldAsReadOnly(TextView textField) {
+        textField.setInputType(0);
+        textField.setFocusable(false);
+        textField.setBackground(null);
+    }
+
+    private void populateBeaconForm() {
         mBeaconNameEditText.setText(mBeacon.beaconName);
         mAdvertisedIdEditText.setText(mBeacon.advertisedId.id);
+        // If properties are not defined then we hide the corresponding views
         if (mBeacon.placeId != null) {
             mPlaceIdEditText.setText(mBeacon.placeId);
         } else if (mPropertiesMode == Mode.VIEW) {
@@ -236,50 +229,49 @@ public class PropertiesFragment extends Fragment {
         }
 
         ArrayList<String> statuses = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.statuses)));
-        beaconStatusSpinner.setSelection(statuses.indexOf(mBeacon.status.getString()));
+        mBeaconStatusSpinner.setSelection(statuses.indexOf(mBeacon.status.getString()));
         if (mBeacon.advertisedId.type != null) {
             ArrayList<String> types = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.types)));
-            beaconTypeSpinner.setSelection(types.indexOf(mBeacon.advertisedId.type.getString()));
+            mBeaconTypeSpinner.setSelection(types.indexOf(mBeacon.advertisedId.type.getString()));
         } else if (mPropertiesMode == Mode.VIEW) {
             mBeaconType.setVisibility(View.GONE);
-            beaconTypeSpinner.setVisibility(View.GONE);
+            mBeaconTypeSpinner.setVisibility(View.GONE);
         }
         if (mBeacon.expectedStability != null) {
             ArrayList<String> types = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.stabilities)));
-            beaconStabilitySpinner.setSelection(types.indexOf(mBeacon.expectedStability.getString()));
+            mBeaconStabilitySpinner.setSelection(types.indexOf(mBeacon.expectedStability.getString()));
         } else if (mPropertiesMode == Mode.VIEW) {
             mBeaconStability.setVisibility(View.GONE);
-            beaconStabilitySpinner.setVisibility(View.GONE);
+            mBeaconStabilitySpinner.setVisibility(View.GONE);
         }
     }
 
     private void validateBeaconData() {
-        boolean isValid = mAdvertisedIdEditText.getText().length() > 0 && beaconStatusSpinner.getSelectedItemPosition() > 0;
+        boolean isValid = mAdvertisedIdEditText.getText().length() > 0 && mBeaconStatusSpinner.getSelectedItemPosition() > 0;
         mAdvertisedIdErrorMessage.setVisibility(mAdvertisedIdEditText.getText().length() > 0 ? View.INVISIBLE : View.VISIBLE);
-        mStatusErrorMessage.setVisibility(beaconStatusSpinner.getSelectedItemPosition() > 0 ? View.INVISIBLE : View.VISIBLE);
+        mStatusErrorMessage.setVisibility(mBeaconStatusSpinner.getSelectedItemPosition() > 0 ? View.INVISIBLE : View.VISIBLE);
         if (!DataUtils.isStringDoubleValue(mLatitudeEditText.getText().toString())) isValid = false;
         if (!DataUtils.isStringDoubleValue(mLongitudeEditText.getText().toString())) isValid = false;
-        if (isValid) registerBeacon();
+        if (isValid) saveBeacon(buildBeaconObject());
     }
 
     private Beacon buildBeaconObject() {
         AdvertisedId advertisedId = new AdvertisedId(mAdvertisedIdEditText.getText().toString(),
-                AdvertisedId.Type.fromString(beaconTypeSpinner.getSelectedItem().toString()));
-
+                AdvertisedId.Type.fromString(mBeaconTypeSpinner.getSelectedItem().toString()));
         LatLng latLng = new LatLng(Double.valueOf(mLatitudeEditText.getText().toString()),
                 Double.valueOf(mLongitudeEditText.getText().toString()));
 
         return new Beacon.BeaconBuilder(advertisedId)
-                .status(beaconStatusSpinner.getSelectedItemPosition() > 0 ? Status.fromString(beaconStatusSpinner.getSelectedItem().toString()) : null)
-                .stability(beaconStabilitySpinner.getSelectedItemPosition() > 0 ? Stability.fromString(beaconStabilitySpinner.getSelectedItem().toString()) : null)
+                .status(mBeaconStatusSpinner.getSelectedItemPosition() > 0 ? Status.fromString(mBeaconStatusSpinner.getSelectedItem().toString()) : null)
+                .stability(mBeaconStabilitySpinner.getSelectedItemPosition() > 0 ? Stability.fromString(mBeaconStabilitySpinner.getSelectedItem().toString()) : null)
                 .description(mDescriptionEditText.getText().toString())
                 .placeId(mPlaceIdEditText.getText().toString())
                 .latLng(latLng)
                 .build();
     }
 
-    private void registerBeacon() {
-        Beacon beacon = buildBeaconObject();
+    private void saveBeacon(Beacon beacon) {
+        showProgressDialog();
         boolean hasStatusChanged = false;
         if (mPropertiesMode == Mode.UPDATE) hasStatusChanged = beacon.status != mBeacon.status;
 
@@ -293,13 +285,15 @@ public class PropertiesFragment extends Fragment {
                 .subscribe(new Subscriber<Beacon>() {
                     @Override
                     public void onCompleted() {
+                        mProgressDialog.dismiss();
                         WatchTowerApplication.get(getActivity()).getBus().post(new BusEvent.BeaconListAmended());
                         getActivity().finish();
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        Timber.d("There was an error : " + error.getMessage());
+                        mProgressDialog.dismiss();
+                        Timber.d("There was an error saving the beacon : " + error.getMessage());
                         if (error instanceof RetrofitError) {
                             DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error);
                         } else {
@@ -314,6 +308,17 @@ public class PropertiesFragment extends Fragment {
                         }
                     }
                 }));
+    }
+
+    private void showProgressDialog() {
+        mProgressDialog = DialogFactory.createProgressDialog(getActivity(), R.string.progress_dialog_saving_beacon);
+        mProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mSubscriptions.unsubscribe();
+            }
+        });
+        mProgressDialog.show();
     }
 
 }

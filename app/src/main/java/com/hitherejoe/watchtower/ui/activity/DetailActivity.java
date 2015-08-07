@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,17 +26,17 @@ import rx.subscriptions.CompositeSubscription;
 
 public class DetailActivity extends BaseActivity {
 
-    @Bind(R.id.pager_beacon_detail)
-    ViewPager mBeaconDetailViewPager;
-
     @Bind(R.id.sliding_tabs)
     TabLayout mTabLayout;
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
 
+    @Bind(R.id.pager_beacon_detail)
+    ViewPager mBeaconDetailViewPager;
+
     private CompositeSubscription mSubscriptions;
-    private static final String EXTRA_BEACON = "con.hitherejoe.proximityapidemo.android.ui.activity.UpdateActivity.EXTRA_BEACON";
+    private static final String EXTRA_BEACON = "con.hitherejoe.watchtower.ui.activity.DetailActivity.EXTRA_BEACON";
     private Beacon mBeacon;
 
     public static Intent getStartIntent(Context context, Beacon beacon) {
@@ -50,7 +51,7 @@ public class DetailActivity extends BaseActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
         mBeacon = getIntent().getParcelableExtra(EXTRA_BEACON);
-        if (mBeacon == null) throw new IllegalArgumentException("Beacon is required!");
+        if (mBeacon == null) throw new IllegalArgumentException("DetailActivity requires a Beacon object!");
         mSubscriptions = new CompositeSubscription();
         setupToolbar();
         setupViewPager();
@@ -87,29 +88,35 @@ public class DetailActivity extends BaseActivity {
     }
 
     private void setupToolbar() {
-        if (mToolbar != null) {
-            setSupportActionBar(mToolbar);
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
     private void setupViewPager() {
         mBeaconDetailViewPager.setOffscreenPageLimit(2);
         mBeaconDetailViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+
+            String[] titles = getResources().getStringArray(R.array.detail_fragment_titles);
+
             @Override
             public Fragment getItem(int position) {
-                return position == 0 ? PropertiesFragment.newInstance(mBeacon, PropertiesFragment.Mode.VIEW) : AlertsFragment.newInstance(mBeacon);
+                return position == 0
+                        ? PropertiesFragment.newInstance(mBeacon, PropertiesFragment.Mode.VIEW)
+                        : AlertsFragment.newInstance(mBeacon);
             }
 
             @Override
             public CharSequence getPageTitle(int position) {
-                return position == 0 ? getString(R.string.fragment_title_properties) : getString(R.string.fragment_title_alerts);
+                return titles[position];
             }
 
             @Override
             public int getCount() {
-                return 2;
+                return titles.length;
             }
         });
         mTabLayout.setupWithViewPager(mBeaconDetailViewPager);

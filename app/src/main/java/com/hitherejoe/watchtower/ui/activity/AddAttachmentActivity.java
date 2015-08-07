@@ -2,6 +2,7 @@ package com.hitherejoe.watchtower.ui.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -145,6 +146,7 @@ public class AddAttachmentActivity extends BaseActivity {
     }
 
     private void addAttachment(Attachment attachment) {
+        showProgressDialog(R.string.progress_dialog_adding_attachment);
         mSubscriptions.add(mDataManager.createAttachment(mBeacon.beaconName, attachment)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(mDataManager.getScheduler())
@@ -169,6 +171,17 @@ public class AddAttachmentActivity extends BaseActivity {
                     @Override
                     public void onNext(Attachment attachment) { }
                 }));
+    }
+
+    private void showProgressDialog(int messageResourceId) {
+        mProgressDialog = DialogFactory.createProgressDialog(this, messageResourceId);
+        mProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mSubscriptions.unsubscribe();
+            }
+        });
+        mProgressDialog.show();
     }
 
 }

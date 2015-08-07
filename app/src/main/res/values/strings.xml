@@ -83,7 +83,9 @@
     <string name="dialog_error_title">Oops</string>
     <string name="dialog_general_error_Message">There was an error making the request</string>
 
+    <string name="progress_dialog_saving_beacon">Saving beacon&#8230;</string>
     <string name="progress_dialog_retrieving_namespaces">Retrieving namespaces&#8230;</string>
+    <string name="progress_dialog_adding_attachment">Adding attachment&#8230;</string>
     <string name="progress_dialog_deleting_attachment">Deleting attachment&#8230;</string>
     <string name="progress_dialog_deleting_all_attachments">Deleting all attachments&#8230;</string>
     <string name="progress_dialog_deleting_type_attachments">Deleting %s attachments&#8230;</string>
@@ -92,6 +94,11 @@
 
     <string name="text_title_namespace">Namespace</string>
     <string name="text_title_data">Data</string>
+
+    <string-array name="detail_fragment_titles">
+        <item>@string/fragment_title_properties</item>
+        <item>@string/fragment_title_alerts</item>
+    </string-array>
 
     <!-- Spinner Value Arrays -->
 

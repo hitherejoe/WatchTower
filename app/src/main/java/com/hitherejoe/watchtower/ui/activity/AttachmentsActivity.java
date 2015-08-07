@@ -2,6 +2,7 @@ package com.hitherejoe.watchtower.ui.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -134,9 +135,7 @@ public class AttachmentsActivity extends BaseActivity {
 
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void deleteAttachmentByType() {
@@ -150,10 +149,9 @@ public class AttachmentsActivity extends BaseActivity {
     }
 
     private void deleteAttachments(String type) {
-        mProgressDialog = DialogFactory.createProgressDialog(this,
-                type == null ? getString(R.string.progress_dialog_deleting_all_attachments)
-                        : getString(R.string.progress_dialog_deleting_type_attachments, type));
-        mProgressDialog.show();
+        showProgressDialog(type == null
+                ? getString(R.string.progress_dialog_deleting_all_attachments)
+                : getString(R.string.progress_dialog_deleting_type_attachments, type));
         mSubscriptions.add(mDataManager.deleteBatchAttachments(mBeacon.beaconName, type)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(mDataManager.getScheduler())
@@ -211,10 +209,7 @@ public class AttachmentsActivity extends BaseActivity {
     }
 
     private void deleteAttachment(final Attachment attachment) {
-        if (mProgressDialog == null) {
-            mProgressDialog = DialogFactory.createProgressDialog(this, R.string.progress_dialog_deleting_attachment);
-        }
-        mProgressDialog.show();
+        showProgressDialog(getString(R.string.progress_dialog_deleting_attachment));
         mSubscriptions.add(mDataManager.deleteAttachment(attachment.attachmentName)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(mDataManager.getScheduler())
@@ -235,18 +230,26 @@ public class AttachmentsActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onNext(Void aVoid) { }
+                    public void onNext(Void aVoid) {
+                    }
                 }));
     }
 
+    private void showProgressDialog(String message) {
+        mProgressDialog = DialogFactory.createProgressDialog(this, message);
+        mProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mSubscriptions.unsubscribe();
+            }
+        });
+        mProgressDialog.show();
+    }
+
     private void handleViewVisibility() {
-        if (mEasyRecycleAdapter.getItemCount() > 0) {
-            mAttachmentsRecycler.setVisibility(View.VISIBLE);
-            mNoAttachmentsText.setVisibility(View.GONE);
-        } else {
-            mAttachmentsRecycler.setVisibility(View.GONE);
-            mNoAttachmentsText.setVisibility(View.VISIBLE);
-        }
+        boolean hasItems = mEasyRecycleAdapter.getItemCount() > 0;
+        mAttachmentsRecycler.setVisibility(hasItems ? View.VISIBLE : View.GONE);
+        mNoAttachmentsText.setVisibility(hasItems ? View.GONE : View.VISIBLE);
     }
 
     private void displayErrorDialog(Throwable error) {
