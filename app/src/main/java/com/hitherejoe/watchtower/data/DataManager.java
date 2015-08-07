@@ -103,32 +103,32 @@ public class DataManager {
         });
     }
 
-    public Observable<Beacon> setBeaconStatus(final Beacon beaconBeacon, Beacon.Status status) {
-        String name = beaconBeacon.beaconName;
-        Observable<Beacon> observable = null;
+    public Observable<Beacon> setBeaconStatus(Beacon beacon, Beacon.Status status) {
+        String name = beacon.beaconName;
+        Observable<Beacon> statusObservable = null;
         switch (status) {
             case ACTIVE:
-                observable = mWatchTowerService.activateBeacon(name);
+                statusObservable = mWatchTowerService.activateBeacon(name);
                 break;
             case INACTIVE:
-                observable = mWatchTowerService.deactivateBeacon(name);
+                statusObservable = mWatchTowerService.deactivateBeacon(name);
                 break;
             case DECOMMISSIONED:
-                observable = mWatchTowerService.decomissionBeacon(name);
+                statusObservable = mWatchTowerService.decomissionBeacon(name);
                 break;
             case STATUS_UNSPECIFIED:
-                observable = mWatchTowerService.deactivateBeacon(name);
+                statusObservable = mWatchTowerService.deactivateBeacon(name);
                 break;
         }
-        if (observable != null) {
-            return observable.flatMap(new Func1<Beacon, Observable<Beacon>>() {
+        if (statusObservable != null) {
+            return statusObservable.flatMap(new Func1<Beacon, Observable<Beacon>>() {
                 @Override
-                public Observable<Beacon> call(Beacon beacon) {
-                    return mWatchTowerService.getBeacon(beaconBeacon.beaconName);
+                public Observable<Beacon> call(Beacon updateBeacon) {
+                    return mWatchTowerService.getBeacon(updateBeacon.beaconName);
                 }
             });
         }
-        return Observable.just(beaconBeacon);
+        return Observable.just(beacon);
     }
 
     public Observable<Diagnostics> getDiagnostics(String beaconName) {
