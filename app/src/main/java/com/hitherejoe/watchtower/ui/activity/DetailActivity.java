@@ -36,7 +36,8 @@ public class DetailActivity extends BaseActivity {
     ViewPager mBeaconDetailViewPager;
 
     private CompositeSubscription mSubscriptions;
-    private static final String EXTRA_BEACON = "con.hitherejoe.watchtower.ui.activity.DetailActivity.EXTRA_BEACON";
+    private static final String EXTRA_BEACON =
+            "com.hitherejoe.watchtower.ui.activity.DetailActivity.EXTRA_BEACON";
     private Beacon mBeacon;
 
     public static Intent getStartIntent(Context context, Beacon beacon) {
@@ -51,7 +52,9 @@ public class DetailActivity extends BaseActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
         mBeacon = getIntent().getParcelableExtra(EXTRA_BEACON);
-        if (mBeacon == null) throw new IllegalArgumentException("DetailActivity requires a Beacon object!");
+        if (mBeacon == null) {
+            throw new IllegalArgumentException("DetailActivity requires a Beacon object!");
+        }
         mSubscriptions = new CompositeSubscription();
         setupToolbar();
         setupViewPager();
@@ -75,7 +78,9 @@ public class DetailActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_edit:
-                startActivity(PropertiesActivity.getStartIntent(DetailActivity.this, mBeacon, PropertiesFragment.Mode.UPDATE));
+                Intent intent = PropertiesActivity.getStartIntent(
+                        DetailActivity.this, mBeacon, PropertiesFragment.Mode.UPDATE);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

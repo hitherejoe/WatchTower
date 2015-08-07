@@ -191,7 +191,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
 
     @OnClick(R.id.fab_add)
     public void onFabAddClick() {
-        startActivityForResult(PropertiesActivity.getStartIntent(this, PropertiesFragment.Mode.REGISTER), REQUEST_CODE_REGISTER_BEACON);
+        Intent intent = PropertiesActivity.getStartIntent(this, PropertiesFragment.Mode.REGISTER);
+        startActivityForResult(intent, REQUEST_CODE_REGISTER_BEACON);
     }
 
     private void pickUserAccount() {
@@ -254,7 +255,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
 
                     @Override
                     public void onNext(String s) {
-                        WatchTowerApplication.get(MainActivity.this).getDataManager().getPreferencesHelper().saveToken(s);
+                        WatchTowerApplication.get(MainActivity.this)
+                                .getDataManager().getPreferencesHelper().saveToken(s);
                         getBeacons();
                     }
                 }));
@@ -271,7 +273,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
 
     private void tryToResolveConnectionError(ConnectionResult connectionResult) {
         try {
-            startIntentSenderForResult(connectionResult.getResolution().getIntentSender(), REQUEST_CODE_PICK_ACCOUNT, null, 0, 0, 0);
+            IntentSender intentSender = connectionResult.getResolution().getIntentSender();
+            startIntentSenderForResult(intentSender, REQUEST_CODE_PICK_ACCOUNT, null, 0, 0, 0);
         } catch (IntentSender.SendIntentException e) {
             Timber.e("Error starting intent to resolve connection issue. " + e.getMessage());
         }

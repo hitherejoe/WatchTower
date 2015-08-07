@@ -46,7 +46,8 @@ public class AddAttachmentActivity extends BaseActivity {
 
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
-    private static final String EXTRA_BEACON = "com.hitherejoe.watchtower.ui.activity.UpdateActivity.EXTRA_BEACON";
+    private static final String EXTRA_BEACON =
+            "com.hitherejoe.watchtower.ui.activity.UpdateActivity.EXTRA_BEACON";
     private Beacon mBeacon;
     private ProgressDialog mProgressDialog;
     ArrayAdapter<String> mSpinnerAdapter;
@@ -130,9 +131,11 @@ public class AddAttachmentActivity extends BaseActivity {
                         mProgressDialog.dismiss();
                         Timber.e("There was an error retrieving the namespaces " + error);
                         if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(AddAttachmentActivity.this, (RetrofitError) error);
+                            DialogFactory.createRetrofitErrorDialog(
+                                    AddAttachmentActivity.this, (RetrofitError) error);
                         } else {
-                            DialogFactory.createSimpleErrorDialog(AddAttachmentActivity.this).show();
+                            DialogFactory.createSimpleErrorDialog(
+                                    AddAttachmentActivity.this).show();
                         }
                     }
 
@@ -162,9 +165,11 @@ public class AddAttachmentActivity extends BaseActivity {
                     public void onError(Throwable error) {
                         Timber.e("There was a problem adding the attachment " + error);
                         if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(AddAttachmentActivity.this, (RetrofitError) error).show();
+                            DialogFactory.createRetrofitErrorDialog(
+                                    AddAttachmentActivity.this, (RetrofitError) error).show();
                         } else {
-                            DialogFactory.createSimpleErrorDialog(AddAttachmentActivity.this).show();
+                            DialogFactory.createSimpleErrorDialog(
+                                    AddAttachmentActivity.this).show();
                         }
                     }
 

@@ -116,12 +116,18 @@ public class PropertiesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPropertiesMode = (Mode) getArguments().getSerializable(EXTRA_MODE);
-        if (mPropertiesMode == null) throw new IllegalArgumentException("Properties fragment requires a mode!");
+        if (mPropertiesMode == null) {
+            throw new IllegalArgumentException("Properties fragment requires a mode!");
+        }
         mBeacon = getArguments().getParcelable(EXTRA_BEACON);
-        if (mPropertiesMode == Mode.UPDATE && mBeacon == null) throw new IllegalArgumentException("Properties fragment requires a beacon!");
+        if (mPropertiesMode == Mode.UPDATE && mBeacon == null) {
+            throw new IllegalArgumentException("Properties fragment requires a beacon!");
+        }
         mSubscriptions = new CompositeSubscription();
         mDataManager = WatchTowerApplication.get(getActivity()).getDataManager();
-        if (mPropertiesMode == Mode.VIEW) WatchTowerApplication.get(getActivity()).getBus().register(this);
+        if (mPropertiesMode == Mode.VIEW) {
+            WatchTowerApplication.get(getActivity()).getBus().register(this);
+        }
         setHasOptionsMenu(true);
     }
 
@@ -137,7 +143,9 @@ public class PropertiesFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mPropertiesMode == Mode.VIEW) WatchTowerApplication.get(getActivity()).getBus().unregister(this);
+        if (mPropertiesMode == Mode.VIEW) {
+            WatchTowerApplication.get(getActivity()).getBus().unregister(this);
+        }
         mSubscriptions.unsubscribe();
     }
 
@@ -228,17 +236,20 @@ public class PropertiesFragment extends Fragment {
             mLongitudeEditText.setVisibility(View.GONE);
         }
 
-        ArrayList<String> statuses = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.statuses)));
+        ArrayList<String> statuses =
+                new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.statuses)));
         mBeaconStatusSpinner.setSelection(statuses.indexOf(mBeacon.status.getString()));
         if (mBeacon.advertisedId.type != null) {
-            ArrayList<String> types = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.types)));
+            ArrayList<String> types =
+                    new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.types)));
             mBeaconTypeSpinner.setSelection(types.indexOf(mBeacon.advertisedId.type.getString()));
         } else if (mPropertiesMode == Mode.VIEW) {
             mBeaconType.setVisibility(View.GONE);
             mBeaconTypeSpinner.setVisibility(View.GONE);
         }
         if (mBeacon.expectedStability != null) {
-            ArrayList<String> types = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.stabilities)));
+            ArrayList<String> types =
+                    new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.stabilities)));
             mBeaconStabilitySpinner.setSelection(types.indexOf(mBeacon.expectedStability.getString()));
         } else if (mPropertiesMode == Mode.VIEW) {
             mBeaconStability.setVisibility(View.GONE);
@@ -247,9 +258,12 @@ public class PropertiesFragment extends Fragment {
     }
 
     private void validateBeaconData() {
-        boolean isValid = mAdvertisedIdEditText.getText().length() > 0 && mBeaconStatusSpinner.getSelectedItemPosition() > 0;
-        mAdvertisedIdErrorMessage.setVisibility(mAdvertisedIdEditText.getText().length() > 0 ? View.INVISIBLE : View.VISIBLE);
-        mStatusErrorMessage.setVisibility(mBeaconStatusSpinner.getSelectedItemPosition() > 0 ? View.INVISIBLE : View.VISIBLE);
+        boolean isValid = mAdvertisedIdEditText.getText().length() > 0
+                && mBeaconStatusSpinner.getSelectedItemPosition() > 0;
+        mAdvertisedIdErrorMessage.setVisibility(mAdvertisedIdEditText.getText().length() > 0
+                ? View.INVISIBLE : View.VISIBLE);
+        mStatusErrorMessage.setVisibility(mBeaconStatusSpinner.getSelectedItemPosition() > 0
+                ? View.INVISIBLE : View.VISIBLE);
         if (!DataUtils.isStringDoubleValue(mLatitudeEditText.getText().toString())) isValid = false;
         if (!DataUtils.isStringDoubleValue(mLongitudeEditText.getText().toString())) isValid = false;
         if (isValid) saveBeacon(buildBeaconObject());
@@ -262,8 +276,12 @@ public class PropertiesFragment extends Fragment {
                 Double.valueOf(mLongitudeEditText.getText().toString()));
 
         return new Beacon.BeaconBuilder(advertisedId)
-                .status(mBeaconStatusSpinner.getSelectedItemPosition() > 0 ? Status.fromString(mBeaconStatusSpinner.getSelectedItem().toString()) : null)
-                .stability(mBeaconStabilitySpinner.getSelectedItemPosition() > 0 ? Stability.fromString(mBeaconStabilitySpinner.getSelectedItem().toString()) : null)
+                .status(mBeaconStatusSpinner.getSelectedItemPosition() > 0
+                        ? Status.fromString(mBeaconStatusSpinner.getSelectedItem().toString())
+                        : null)
+                .stability(mBeaconStabilitySpinner.getSelectedItemPosition() > 0
+                        ? Stability.fromString(mBeaconStabilitySpinner.getSelectedItem().toString())
+                        : null)
                 .description(mDescriptionEditText.getText().toString())
                 .placeId(mPlaceIdEditText.getText().toString())
                 .latLng(latLng)
@@ -286,7 +304,8 @@ public class PropertiesFragment extends Fragment {
                     @Override
                     public void onCompleted() {
                         mProgressDialog.dismiss();
-                        WatchTowerApplication.get(getActivity()).getBus().post(new BusEvent.BeaconListAmended());
+                        WatchTowerApplication.get(
+                                getActivity()).getBus().post(new BusEvent.BeaconListAmended());
                         getActivity().finish();
                     }
 
@@ -295,7 +314,8 @@ public class PropertiesFragment extends Fragment {
                         mProgressDialog.dismiss();
                         Timber.d("There was an error saving the beacon : " + error.getMessage());
                         if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error);
+                            DialogFactory.createRetrofitErrorDialog(
+                                    getActivity(), (RetrofitError) error);
                         } else {
                             DialogFactory.createSimpleErrorDialog(getActivity()).show();
                         }
@@ -304,7 +324,8 @@ public class PropertiesFragment extends Fragment {
                     @Override
                     public void onNext(Beacon beacon) {
                         if (mPropertiesMode == Mode.UPDATE) {
-                            WatchTowerApplication.get(getActivity()).getBus().post(new BusEvent.BeaconUpdated(beacon));
+                            WatchTowerApplication.get(getActivity())
+                                    .getBus().post(new BusEvent.BeaconUpdated(beacon));
                         }
                     }
                 }));

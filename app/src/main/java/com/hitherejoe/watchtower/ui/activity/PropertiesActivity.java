@@ -41,7 +41,9 @@ public class PropertiesActivity extends BaseActivity {
         Mode mode = (PropertiesFragment.Mode) getIntent().getSerializableExtra(EXTRA_MODE);
         if (mode == null) throw new IllegalArgumentException(TAG + ": Beacon is required!");
         Beacon beacon = getIntent().getParcelableExtra(EXTRA_BEACON);
-        if (mode == PropertiesFragment.Mode.UPDATE && beacon == null) throw new IllegalArgumentException(TAG + ": Beacon is required!");
+        if (mode == PropertiesFragment.Mode.UPDATE && beacon == null) {
+            throw new IllegalArgumentException(TAG + ": Beacon is required!");
+        }
         setupActionBar(mode);
         addFragment(beacon, mode);
     }

@@ -55,7 +55,8 @@ public class AttachmentsActivity extends BaseActivity {
 
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
-    private static final String EXTRA_BEACON = "com.hitherejoe.watchtower.ui.activity.UpdateActivity.EXTRA_BEACON";
+    private static final String EXTRA_BEACON =
+            "com.hitherejoe.watchtower.ui.activity.UpdateActivity.EXTRA_BEACON";
     private Beacon mBeacon;
     private EasyRecyclerAdapter<Attachment> mEasyRecycleAdapter;
     private List<Attachment> mAttachments;
