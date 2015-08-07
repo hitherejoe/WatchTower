@@ -58,26 +58,6 @@ public class DataManager {
         return mWatchTowerService.registerBeacon(beacon);
     }
 
-    public Observable<String> getAccessToken(final Context context, final String accountName, final String scopes, final boolean cacheToken) {
-        return Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                try {
-                    String token = GoogleAuthUtil.getToken(context, accountName, scopes);
-                    if (!cacheToken) GoogleAuthUtil.clearToken(context, token);
-                    subscriber.onNext(token);
-                    subscriber.onCompleted();
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                } catch (UserRecoverableAuthException e) {
-                    subscriber.onError(e);
-                } catch (GoogleAuthException e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
-    }
-
     public Observable<Beacon> getBeacons() {
         return mWatchTowerService.getBeacons()
                 .flatMapIterable(new Func1<WatchTowerService.BeaconsResponse, Iterable<? extends Beacon>>() {

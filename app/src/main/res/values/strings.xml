@@ -65,6 +65,7 @@
     <string name="text_no_attachments">Sorry, no attachments to display</string>
     <string name="text_no_alerts">Sorry, no alerts to display</string>
 
+    <string name="error_message_play_services">Sorry, you need Google Play Services to use this app :(</string>
     <string name="error_message_advertised_id">The Advertised ID cannot be blank</string>
     <string name="error_message_status">The beacon status cannot be blank</string>
     <string name="error_message_attachment_data">The attachment data cannot be blank</string>

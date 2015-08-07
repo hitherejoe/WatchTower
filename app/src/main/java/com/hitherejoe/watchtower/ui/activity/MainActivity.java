@@ -2,13 +2,18 @@ package com.hitherejoe.watchtower.ui.activity;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,21 +21,23 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.hitherejoe.watchtower.R;
 import com.hitherejoe.watchtower.WatchTowerApplication;
 import com.hitherejoe.watchtower.data.BusEvent;
 import com.hitherejoe.watchtower.data.DataManager;
 import com.hitherejoe.watchtower.data.model.Beacon;
+import com.hitherejoe.watchtower.data.model.ErrorResponse;
 import com.hitherejoe.watchtower.ui.adapter.BeaconHolder;
 import com.hitherejoe.watchtower.ui.fragment.PropertiesFragment;
+import com.hitherejoe.watchtower.util.AccountUtils;
+import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.DialogFactory;
 import com.squareup.otto.Subscribe;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.Bind;
@@ -43,50 +50,107 @@ import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
-public class MainActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
-    @Bind(R.id.text_no_beacons)
-    TextView mNoBeaconsText;
-
-    @Bind(R.id.recycler_beacons)
-    RecyclerView mBeaconsRecycler;
+public class MainActivity extends BaseActivity {
 
     @Bind(R.id.progress_indicator)
     ProgressBar mProgressBar;
 
+    @Bind(R.id.recycler_beacons)
+    RecyclerView mBeaconsRecycler;
+
     @Bind(R.id.swipe_refresh)
     SwipeRefreshLayout mSwipeRefresh;
 
-    static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
-    static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 2000;
-    private static final int REQUEST_CODE_PLAY_SERVICES = 1238;
-    private static final int REQUEST_CODE_REGISTER_BEACON = 1538;
+    @Bind(R.id.text_no_beacons)
+    TextView mNoBeaconsText;
+
+    private static final int REQUEST_CODE_AUTHORIZATION = 1234;
+    private static final int REQUEST_CODE_PLAY_SERVICES = 1235;
+    private static final int REQUEST_CODE_PICK_ACCOUNT = 1236;
+    private static final int REQUEST_CODE_REGISTER_BEACON = 1237;
+    private static final String ACCOUNT_TYPE = "com.google";
+    private static final String REQUEST_SCOPE =
+            "oauth2:https://www.googleapis.com/auth/userlocation.beacon.registry";
 
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
     private EasyRecyclerAdapter<Beacon> mEasyRecycleAdapter;
-    //private GoogleApiClient mGoogleApiClient;
+    private AccountManager mAccountManager;
+    private boolean mHasTriedNewAuthToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mHasTriedNewAuthToken = false;
+        mAccountManager = AccountManager.get(this);
         mSubscriptions = new CompositeSubscription();
         mDataManager = WatchTowerApplication.get(this).getDataManager();
         mEasyRecycleAdapter = new EasyRecyclerAdapter<>(this, BeaconHolder.class, mBeaconListener);
         setupLayoutViews();
-        AccountManager manager = AccountManager.get(this);
-        Account[] accounts = manager.getAccountsByType("com.google");
-        final boolean connected = accounts != null && accounts.length > 0;
-       // if (!connected) {
-            pickUserAccount();
-       // } else {
-         //   getBeacons();
-       // }
-        WatchTowerApplication.get(this).getBus().register(this);
 
+        if (AccountUtils.isUserAuthenticated(this)) {
+            getBeacons();
+        } else {
+            if (checkPlayServices()) chooseAccount();
+        }
+
+        WatchTowerApplication.get(this).getBus().register(this);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        WatchTowerApplication.get(this).getBus().unregister(this);
+        mSubscriptions.unsubscribe();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_about:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_CODE_AUTHORIZATION) {
+                requestToken();
+            } else if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+                String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                mDataManager.getPreferencesHelper().setUser(accountName);
+                AccountUtils.invalidateToken(this);
+                requestToken();
+            } else {
+                mProgressBar.setVisibility(View.GONE);
+                DialogFactory.createSimpleErrorDialog(this).show();
+            }
+        }
+    }
+
+    @Subscribe
+    public void onBeaconListAmended(BusEvent.BeaconListAmended event) {
+        getBeacons();
+    }
+
+    @OnClick(R.id.fab_add)
+    public void onFabAddClick() {
+        Intent intent = PropertiesActivity.getStartIntent(this, PropertiesFragment.Mode.REGISTER);
+        startActivityForResult(intent, REQUEST_CODE_REGISTER_BEACON);
+    }
+
     private void setupLayoutViews() {
         mBeaconsRecycler.setLayoutManager(new LinearLayoutManager(this));
         mBeaconsRecycler.setAdapter(mEasyRecycleAdapter);
@@ -97,6 +161,49 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                 getBeacons();
             }
         });
+    }
+
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        REQUEST_CODE_PLAY_SERVICES).show();
+            } else {
+                Dialog playServicesDialog = DialogFactory.createSimpleOkErrorDialog(
+                        this,
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.error_message_play_services));
+                playServicesDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        finish();
+                    }
+                });
+                playServicesDialog.show();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private void chooseAccount() {
+        Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                new String[]{ACCOUNT_TYPE}, false, null, null, null, null);
+        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+    }
+
+    private void requestToken() {
+        Account userAccount = null;
+        String user = mDataManager.getPreferencesHelper().getUser();
+        for (Account account : mAccountManager.getAccountsByType(ACCOUNT_TYPE)) {
+            if (account.name.equals(user)) {
+                userAccount = account;
+                break;
+            }
+        }
+        mAccountManager.getAuthToken(userAccount, REQUEST_SCOPE, null, this,
+                new OnTokenReceivedCallback(), null);
     }
 
     private void getBeacons() {
@@ -124,7 +231,15 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                         mProgressBar.setVisibility(View.GONE);
                         mSwipeRefresh.setRefreshing(false);
                         if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(MainActivity.this, (RetrofitError) error);
+                            ErrorResponse errorResponse = DataUtils.parseRetrofitError(error);
+                            int errorCode = errorResponse.error.code;
+                            if (!mHasTriedNewAuthToken && (errorCode == 401 || errorCode == 403)) {
+                                mHasTriedNewAuthToken = true;
+                                AccountUtils.invalidateToken(MainActivity.this);
+                                requestToken();
+                            } else {
+                                DialogFactory.createRetrofitErrorDialog(MainActivity.this, (RetrofitError) error);
+                            }
                         } else {
                             DialogFactory.createSimpleErrorDialog(MainActivity.this).show();
                         }
@@ -135,149 +250,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                         mEasyRecycleAdapter.addItem(beacon);
                     }
                 }));
-    }
-
-    @Subscribe
-    public void onBeaconChanged(BusEvent.BeaconListAmended event) {
-        getBeacons();
-    }
-
-    private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                        REQUEST_CODE_PLAY_SERVICES).show();
-            } else {
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        retrieveAuthToken();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        WatchTowerApplication.get(this).getBus().unregister(this);
-        mSubscriptions.unsubscribe();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_about:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @OnClick(R.id.fab_add)
-    public void onFabAddClick() {
-        Intent intent = PropertiesActivity.getStartIntent(this, PropertiesFragment.Mode.REGISTER);
-        startActivityForResult(intent, REQUEST_CODE_REGISTER_BEACON);
-    }
-
-    private void pickUserAccount() {
-        String[] accountTypes = new String[]{"com.google"};
-        Intent intent = AccountPicker.newChooseAccountIntent(null, null,
-                accountTypes, false, null, null, null, null);
-        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
-    }
-
-    String mEmail; // Received from newChooseAccountIntent(); passed to getToken()
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
-            // Receiving a result from the AccountPicker
-            if (resultCode == RESULT_OK) {
-                mEmail = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                //mGoogleApiClient.connect();
-                // With the account name acquired, go get the auth token
-                retrieveAuthToken();
-
-
-            } else if (resultCode == RESULT_CANCELED) {
-                // The account picker dialog closed without selecting an account.
-                // Notify users that they must pick an account to proceed.
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR) {
-            Log.d("ERROR", "ERRRRRRRR");
-        } else if (requestCode == REQUEST_CODE_REGISTER_BEACON) {
-
-        }
-    }
-
-    private void retrieveAuthToken() {
-
-        String auth = "oauth2:https://www.googleapis.com/auth/userlocation.beacon.registry";
-        mSubscriptions.add(mDataManager.getAccessToken(MainActivity.this, mEmail, auth, false)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(mDataManager.getScheduler())
-                .subscribe(new Subscriber<String>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        Timber.e("Error getting auth token: " + error);
-                        if (error instanceof UserRecoverableAuthException) {
-                            Timber.w("UserRecoverableAuthException has happen. Opening intent to resolve it");
-                            Intent recover = ((UserRecoverableAuthException) error).getIntent();
-                            startActivityForResult(recover, 1000);
-                        } else if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(MainActivity.this, (RetrofitError) error);
-                        } else {
-                            DialogFactory.createSimpleErrorDialog(MainActivity.this).show();
-                        }
-                    }
-
-                    @Override
-                    public void onNext(String s) {
-                        WatchTowerApplication.get(MainActivity.this)
-                                .getDataManager().getPreferencesHelper().saveToken(s);
-                        getBeacons();
-                    }
-                }));
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            tryToResolveConnectionError(connectionResult);
-        } else {
-            Timber.d("FAIL: " + connectionResult.toString());
-        }
-    }
-
-    private void tryToResolveConnectionError(ConnectionResult connectionResult) {
-        try {
-            IntentSender intentSender = connectionResult.getResolution().getIntentSender();
-            startIntentSenderForResult(intentSender, REQUEST_CODE_PICK_ACCOUNT, null, 0, 0, 0);
-        } catch (IntentSender.SendIntentException e) {
-            Timber.e("Error starting intent to resolve connection issue. " + e.getMessage());
-        }
     }
 
     private BeaconHolder.BeaconListener mBeaconListener = new BeaconHolder.BeaconListener() {
@@ -291,4 +263,29 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
             startActivity(DetailActivity.getStartIntent(MainActivity.this, beacon));
         }
     };
+
+    private class OnTokenReceivedCallback implements AccountManagerCallback<Bundle> {
+
+        @Override
+        public void run(AccountManagerFuture<Bundle> result) {
+            try {
+                Bundle bundle = result.getResult();
+
+                Intent launch = (Intent) bundle.get(AccountManager.KEY_INTENT);
+                if (launch != null) {
+                    startActivityForResult(launch, REQUEST_CODE_AUTHORIZATION);
+                } else {
+                    String token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+                    mDataManager.getPreferencesHelper().saveToken(token);
+                    getBeacons();
+                }
+            } catch (AuthenticatorException e) {
+                Timber.e("There was an Authenticator error: " + e);
+            } catch (OperationCanceledException e) {
+                Timber.e("There was an Operation error: " + e);
+            } catch (IOException e) {
+                Timber.e("There was an IO Exception: " + e);
+            }
+        }
+    }
 }

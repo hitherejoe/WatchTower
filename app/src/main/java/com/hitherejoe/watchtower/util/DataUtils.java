@@ -4,13 +4,24 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.util.Base64;
 
+import com.google.gson.Gson;
+import com.hitherejoe.watchtower.data.model.ErrorResponse;
+
 import java.util.regex.Pattern;
+
+import retrofit.RetrofitError;
+import retrofit.mime.TypedByteArray;
 
 public class DataUtils {
 
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo() != null;
+    }
+
+    public static ErrorResponse parseRetrofitError(Throwable error) {
+        String json = new String(((TypedByteArray) ((RetrofitError) error).getResponse().getBody()).getBytes());
+        return new Gson().fromJson(json, ErrorResponse.class);
     }
 
     public static byte[] base64Decode(String s) {

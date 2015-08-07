@@ -7,18 +7,26 @@ public class PreferencesHelper {
 
     private static SharedPreferences mPref;
 
-    public static final String PREF_FILE_NAME = "android_boilerplate_pref_file";
-    public static final String PREF_KEY_TOKEN = "key_token";
+    private static final String PREF_FILE_NAME = "watchtower_pref_file";
+    private static final String PREF_KEY_TOKEN = "key_access_token";
+    private static final String PREF_KEY_USER = "key_user";
 
 
     public PreferencesHelper(Context context) {
         mPref = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
     }
 
+    public void setUser(String user) {
+        mPref.edit().putString(PREF_KEY_USER, user).apply();
+    }
+
     public void saveToken(String token) {
         mPref.edit().putString(PREF_KEY_TOKEN, token).apply();
     }
 
+    public String getUser() {
+        return mPref.getString(PREF_KEY_USER, null);
+    }
     public String getToken() {
         return mPref.getString(PREF_KEY_TOKEN, null);
     }

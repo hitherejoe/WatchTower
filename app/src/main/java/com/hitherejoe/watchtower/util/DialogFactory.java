@@ -35,8 +35,7 @@ public class DialogFactory {
     }
 
     public static Dialog createRetrofitErrorDialog(Context context, RetrofitError error) {
-        String json = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
-        ErrorResponse errorResponse = new Gson().fromJson(json, ErrorResponse.class);
+        ErrorResponse errorResponse = DataUtils.parseRetrofitError(error);
         return createSimpleOkErrorDialog(context, "Error: " + errorResponse.error.code, errorResponse.error.message);
     }
 
