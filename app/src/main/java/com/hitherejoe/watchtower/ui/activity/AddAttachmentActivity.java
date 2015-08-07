@@ -116,8 +116,8 @@ public class AddAttachmentActivity extends BaseActivity {
         mProgressDialog = DialogFactory.createProgressDialog(this, R.string.progress_dialog_retrieving_namespaces);
         mProgressDialog.show();
         mSubscriptions.add(mDataManager.getNamespaces()
-                .subscribeOn(mDataManager.getScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<WatchTowerService.NamespacesResponse>() {
                     @Override
                     public void onCompleted() {
@@ -146,8 +146,8 @@ public class AddAttachmentActivity extends BaseActivity {
 
     private void addAttachment(Attachment attachment) {
         mSubscriptions.add(mDataManager.createAttachment(mBeacon.beaconName, attachment)
-                .subscribeOn(mDataManager.getScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<Attachment>() {
                     @Override
                     public void onCompleted() {

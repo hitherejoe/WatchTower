@@ -24,6 +24,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import retrofit.RetrofitError;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
@@ -91,7 +92,8 @@ public class AlertsFragment extends Fragment {
 
     private void getDiagnostics() {
         mSubscriptions.add(mDataManager.getDiagnostics(mBeacon.beaconName)
-                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<Diagnostics>() {
                     @Override
                     public void onCompleted() {

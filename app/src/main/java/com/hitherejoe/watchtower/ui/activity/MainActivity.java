@@ -102,8 +102,8 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     private void getBeacons() {
         mEasyRecycleAdapter.setItems(new ArrayList<Beacon>());
         mSubscriptions.add(mDataManager.getBeacons()
-                .subscribeOn(mDataManager.getScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<Beacon>() {
                     @Override
                     public void onCompleted() {

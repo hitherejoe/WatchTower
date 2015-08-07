@@ -155,8 +155,8 @@ public class AttachmentsActivity extends BaseActivity {
                         : getString(R.string.progress_dialog_deleting_type_attachments, type));
         mProgressDialog.show();
         mSubscriptions.add(mDataManager.deleteBatchAttachments(mBeacon.beaconName, type)
-                .subscribeOn(mDataManager.getScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<WatchTowerService.AttachmentResponse>() {
                     @Override
                     public void onCompleted() {
@@ -183,8 +183,8 @@ public class AttachmentsActivity extends BaseActivity {
 
     private void retrieveAttachments() {
         mSubscriptions.add(mDataManager.getAttachments(mBeacon.beaconName, null)
-                .subscribeOn(mDataManager.getScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<WatchTowerService.AttachmentResponse>() {
                     @Override
                     public void onCompleted() {
@@ -216,8 +216,8 @@ public class AttachmentsActivity extends BaseActivity {
         }
         mProgressDialog.show();
         mSubscriptions.add(mDataManager.deleteAttachment(attachment.attachmentName)
-                .subscribeOn(mDataManager.getScheduler())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<Void>() {
                     @Override
                     public void onCompleted() {

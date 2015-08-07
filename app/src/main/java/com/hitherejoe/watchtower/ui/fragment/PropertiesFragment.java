@@ -34,6 +34,7 @@ import butterknife.ButterKnife;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
@@ -287,6 +288,7 @@ public class PropertiesFragment extends Fragment {
                 : mDataManager.registerBeacon(beacon);
 
         mSubscriptions.add(beaconObservable
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<Beacon>() {
                     @Override
