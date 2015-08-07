@@ -25,8 +25,8 @@ import com.hitherejoe.watchtower.data.remote.WatchTowerService;
 import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.DialogFactory;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import retrofit.RetrofitError;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -34,13 +34,13 @@ import rx.subscriptions.CompositeSubscription;
 
 public class AddAttachmentActivity extends BaseActivity {
 
-    @InjectView(R.id.spinner_namespace)
+    @Bind(R.id.spinner_namespace)
     Spinner mNamespaceSpinner;
 
-    @InjectView(R.id.edit_text_data)
+    @Bind(R.id.edit_text_data)
     EditText mAttachmentDataText;
 
-    @InjectView(R.id.text_data_error_message)
+    @Bind(R.id.text_data_error_message)
     TextView mDataErrorText;
 
     private static final String TAG = "RegisterActivity";
@@ -61,7 +61,7 @@ public class AddAttachmentActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_attachment);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         mBeacon = getIntent().getParcelableExtra(EXTRA_BEACON);
         if (mBeacon == null) throw new IllegalArgumentException("Beacon is required!");
         mSubscriptions = new CompositeSubscription();

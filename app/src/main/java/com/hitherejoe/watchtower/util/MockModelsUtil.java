@@ -27,9 +27,7 @@ public class MockModelsUtil {
         beacon.latLng = new LatLng();
         beacon.latLng.latitude = 54.331;
         beacon.latLng.longitude = -12.435;
-        beacon.advertisedId = new AdvertisedId();
-        beacon.advertisedId.id = "IDIDIDIDID";
-        beacon.advertisedId.type = AdvertisedId.Type.EDDYSTONE;
+        beacon.advertisedId = new AdvertisedId("IDIDIDIDID", AdvertisedId.Type.EDDYSTONE);
         return beacon;
     }
 

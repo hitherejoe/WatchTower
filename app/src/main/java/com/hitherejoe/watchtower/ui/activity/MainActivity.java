@@ -32,27 +32,26 @@ import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 import rx.Subscriber;
-import rx.android.app.AppObservable;
-import rx.schedulers.Schedulers;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
 import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
 public class MainActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    @InjectView(R.id.text_no_beacons)
+    @Bind(R.id.text_no_beacons)
     TextView mNoBeaconsText;
 
-    @InjectView(R.id.recycler_beacons)
+    @Bind(R.id.recycler_beacons)
     RecyclerView mBeaconsRecycler;
 
-    @InjectView(R.id.progress_indicator)
+    @Bind(R.id.progress_indicator)
     ProgressBar mProgressBar;
 
-    @InjectView(R.id.swipe_refresh)
+    @Bind(R.id.swipe_refresh)
     SwipeRefreshLayout mSwipeRefresh;
 
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
@@ -70,7 +69,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         mSubscriptions = new CompositeSubscription();
         mDataManager = WatchTowerApplication.get().getDataManager();
         mEasyRecycleAdapter = new EasyRecyclerAdapter<>(this, BeaconHolder.class, mBeaconListener);
@@ -100,8 +99,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
 
     private void getBeacons() {
         mEasyRecycleAdapter.setItems(new ArrayList<Beacon>());
-        AppObservable.bindActivity(this, mDataManager.getBeacons())
-                .subscribeOn(Schedulers.io())
+        mSubscriptions.add(mDataManager.getBeacons()
+                .subscribeOn(mDataManager.getScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Beacon>() {
                     @Override
                     public void onCompleted() {
@@ -119,7 +119,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                     @Override
                     public void onError(Throwable e) {
                         //dialog
-                        // show message inplace of beacons
+                        // show message in-place of beacons
                         Log.e(TAG, "There was an error retrieving the beacons " + e);
                         mProgressBar.setVisibility(View.GONE);
                         mSwipeRefresh.setRefreshing(false);
@@ -129,7 +129,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                     public void onNext(Beacon beacon) {
                         mEasyRecycleAdapter.addItem(beacon);
                     }
-                });
+                }));
     }
 
     @Subscribe
@@ -224,9 +224,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     private void retrieveAuthToken() {
 
         String auth = "oauth2:https://www.googleapis.com/auth/userlocation.beacon.registry";
-        AppObservable.bindActivity(this,
-                mDataManager.getAccessToken(MainActivity.this, mEmail, auth, false))
-                .subscribeOn(Schedulers.io())
+        mSubscriptions.add(mDataManager.getAccessToken(MainActivity.this, mEmail, auth, false)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<String>() {
                     @Override
                     public void onCompleted() {
@@ -247,31 +247,9 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                     @Override
                     public void onNext(String s) {
                         WatchTowerApplication.get().getDataManager().getPreferencesHelper().saveToken(s);
-                        //registerBeacon(s);
-/*
-                        AppObservable.bindActivity(MainActivity.this, mDataManager.updateBeacon("3!73636e3353447267534433327253453d", beacon))
-                                .subscribeOn(Schedulers.io())
-                                .subscribe(new Subscriber<Beacon>() {
-                                    @Override
-                                    public void onCompleted() {
-
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-
-                                    }
-
-                                    @Override
-                                    public void onNext(Beacon beacon) {
-                                        Log.d("BEACON", beacon.beaconName);
-                                    }
-                                });
-                                */
                         getBeacons();
-
                     }
-                });
+                }));
     }
 
     @Override

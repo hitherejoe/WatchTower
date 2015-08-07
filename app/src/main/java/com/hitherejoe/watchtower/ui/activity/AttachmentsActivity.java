@@ -29,8 +29,8 @@ import com.squareup.otto.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 import retrofit.RetrofitError;
 import rx.Subscriber;
@@ -40,16 +40,16 @@ import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
 public class AttachmentsActivity extends BaseActivity {
 
-    @InjectView(R.id.text_no_attachments)
+    @Bind(R.id.text_no_attachments)
     TextView mNoAttachmentsText;
 
-    @InjectView(R.id.recycler_attachments)
+    @Bind(R.id.recycler_attachments)
     RecyclerView mAttachmentsRecycler;
 
-    @InjectView(R.id.progress_indicator)
+    @Bind(R.id.progress_indicator)
     ProgressBar mProgressBar;
 
-    @InjectView(R.id.swipe_refresh)
+    @Bind(R.id.swipe_refresh)
     SwipeRefreshLayout mSwipeRefresh;
 
     private static final String TAG = "AttachmentsActivity";
@@ -71,7 +71,7 @@ public class AttachmentsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attachments);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         mBeacon = getIntent().getParcelableExtra(EXTRA_BEACON);
         if (mBeacon == null) throw new IllegalArgumentException("Beacon is required!");
         mSubscriptions = new CompositeSubscription();

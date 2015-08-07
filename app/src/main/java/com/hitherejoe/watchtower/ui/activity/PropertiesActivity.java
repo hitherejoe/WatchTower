@@ -37,7 +37,7 @@ public class PropertiesActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         Mode mode = (PropertiesFragment.Mode) getIntent().getSerializableExtra(EXTRA_MODE);
         if (mode == null) throw new IllegalArgumentException(TAG + ": Beacon is required!");
         Beacon beacon = getIntent().getParcelableExtra(EXTRA_BEACON);

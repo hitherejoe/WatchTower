@@ -19,75 +19,75 @@ import com.hitherejoe.watchtower.data.BusEvent;
 import com.hitherejoe.watchtower.data.DataManager;
 import com.hitherejoe.watchtower.data.model.AdvertisedId;
 import com.hitherejoe.watchtower.data.model.Beacon;
+import com.hitherejoe.watchtower.data.model.Beacon.Status;
+import com.hitherejoe.watchtower.data.model.Beacon.Stability;
 import com.hitherejoe.watchtower.data.model.LatLng;
 import com.hitherejoe.watchtower.ui.activity.DetailActivity;
 import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.DialogFactory;
 import com.squareup.otto.Subscribe;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.app.AppObservable;
 import rx.subscriptions.CompositeSubscription;
 
 public class PropertiesFragment extends Fragment {
 
-    @InjectView(R.id.spinner_status)
+    @Bind(R.id.spinner_status)
     Spinner beaconStatusSpinner;
 
-    @InjectView(R.id.spinner_type)
+    @Bind(R.id.spinner_type)
     Spinner beaconTypeSpinner;
 
-    @InjectView(R.id.spinner_stability)
+    @Bind(R.id.spinner_stability)
     Spinner beaconStabilitySpinner;
 
-    @InjectView(R.id.edit_text_beacon_name)
+    @Bind(R.id.edit_text_beacon_name)
     EditText mBeaconNameEditText;
 
-    @InjectView(R.id.edit_text_advertised_id)
+    @Bind(R.id.edit_text_advertised_id)
     EditText mAdvertisedIdEditText;
 
-    @InjectView(R.id.edit_text_description)
+    @Bind(R.id.edit_text_description)
     EditText mDescriptionEditText;
 
-    @InjectView(R.id.edit_text_latitude)
+    @Bind(R.id.edit_text_latitude)
     EditText mLatitudeEditText;
 
-    @InjectView(R.id.edit_text_longitude)
+    @Bind(R.id.edit_text_longitude)
     EditText mLongitudeEditText;
 
-    @InjectView(R.id.edit_text_place_id)
+    @Bind(R.id.edit_text_place_id)
     EditText mPlaceIdEditText;
 
-    @InjectView(R.id.text_title_beacon_name)
+    @Bind(R.id.text_title_beacon_name)
     TextView mBeaconNameText;
 
-    @InjectView(R.id.text_title_place_id)
+    @Bind(R.id.text_title_place_id)
     TextView mBeaconPlaceId;
 
-    @InjectView(R.id.text_title_description)
+    @Bind(R.id.text_title_description)
     TextView mBeaconDescription;
 
-    @InjectView(R.id.text_title_location)
+    @Bind(R.id.text_title_location)
     TextView mBeaconLocation;
 
-    @InjectView(R.id.text_title_type)
+    @Bind(R.id.text_title_type)
     TextView mBeaconType;
 
-    @InjectView(R.id.text_title_stability)
+    @Bind(R.id.text_title_stability)
     TextView mBeaconStability;
 
-    @InjectView(R.id.text_advertised_id_error_message)
+    @Bind(R.id.text_advertised_id_error_message)
     TextView mAdvertisedIdErrorMessage;
 
-    @InjectView(R.id.text_status_error_message)
+    @Bind(R.id.text_status_error_message)
     TextView mStatusErrorMessage;
 
     private static final String EXTRA_MODE = "EXTRA_MODE";
@@ -125,7 +125,7 @@ public class PropertiesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_properties, container, false);
-        ButterKnife.inject(this, fragmentView);
+        ButterKnife.bind(this, fragmentView);
         setupFragment();
         if (mPropertiesMode == Mode.UPDATE || mPropertiesMode == Mode.VIEW) {
             disableViewInteration();
@@ -194,6 +194,8 @@ public class PropertiesFragment extends Fragment {
             beaconStatusSpinner.setEnabled(false);
             beaconTypeSpinner.setEnabled(false);
             beaconStabilitySpinner.setEnabled(false);
+            mAdvertisedIdErrorMessage.setVisibility(View.GONE);
+            mStatusErrorMessage.setVisibility(View.GONE);
         }
     }
 
@@ -232,6 +234,7 @@ public class PropertiesFragment extends Fragment {
             mLatitudeEditText.setVisibility(View.GONE);
             mLongitudeEditText.setVisibility(View.GONE);
         }
+
         ArrayList<String> statuses = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.statuses)));
         beaconStatusSpinner.setSelection(statuses.indexOf(mBeacon.status.getString()));
         if (mBeacon.advertisedId.type != null) {
@@ -254,35 +257,37 @@ public class PropertiesFragment extends Fragment {
         boolean isValid = mAdvertisedIdEditText.getText().length() > 0 && beaconStatusSpinner.getSelectedItemPosition() > 0;
         mAdvertisedIdErrorMessage.setVisibility(mAdvertisedIdEditText.getText().length() > 0 ? View.INVISIBLE : View.VISIBLE);
         mStatusErrorMessage.setVisibility(beaconStatusSpinner.getSelectedItemPosition() > 0 ? View.INVISIBLE : View.VISIBLE);
+        if (!DataUtils.isStringDoubleValue(mLatitudeEditText.getText().toString())) isValid = false;
+        if (!DataUtils.isStringDoubleValue(mLongitudeEditText.getText().toString())) isValid = false;
         if (isValid) registerBeacon();
     }
 
+    private Beacon buildBeaconObject() {
+        AdvertisedId advertisedId = new AdvertisedId(mAdvertisedIdEditText.getText().toString(),
+                AdvertisedId.Type.fromString(beaconTypeSpinner.getSelectedItem().toString()));
+
+        LatLng latLng = new LatLng(Double.valueOf(mLatitudeEditText.getText().toString()),
+                Double.valueOf(mLongitudeEditText.getText().toString()));
+
+        return new Beacon.BeaconBuilder(advertisedId)
+                .status(beaconStatusSpinner.getSelectedItemPosition() > 0 ? Status.fromString(beaconStatusSpinner.getSelectedItem().toString()) : null)
+                .stability(beaconStabilitySpinner.getSelectedItemPosition() > 0 ? Stability.fromString(beaconStabilitySpinner.getSelectedItem().toString()) : null)
+                .description(mDescriptionEditText.getText().toString())
+                .placeId(mPlaceIdEditText.getText().toString())
+                .latLng(latLng)
+                .build();
+    }
+
     private void registerBeacon() {
-        Beacon beacon = new Beacon();
-        AdvertisedId id = new AdvertisedId();
+        Beacon beacon = buildBeaconObject();
         boolean hasStatusChanged = false;
         if (mPropertiesMode == Mode.UPDATE) hasStatusChanged = beacon.status != mBeacon.status;
-        id.id =  mAdvertisedIdEditText.getText().toString();
-        if (beaconTypeSpinner.getSelectedItemPosition() > 0) id.type = AdvertisedId.Type.fromString(beaconTypeSpinner.getSelectedItem().toString());
-        beacon.advertisedId = id;
-        LatLng latLng = new LatLng();
-        if (DataUtils.isStringDoubleValue(mLatitudeEditText.getText().toString())) {
-            latLng.latitude = Double.valueOf(mLatitudeEditText.getText().toString());
-        }
-        if (DataUtils.isStringDoubleValue(mLongitudeEditText.getText().toString())) {
-            latLng.longitude = Double.valueOf(mLongitudeEditText.getText().toString());
-        }
-        beacon.latLng = latLng;
-        if (beaconStatusSpinner.getSelectedItemPosition() > 0) {
-            beacon.status = Beacon.Status.fromString(beaconStatusSpinner.getSelectedItem().toString());
-        }
-        if (beaconStabilitySpinner.getSelectedItemPosition() > 0) {
-            beacon.expectedStability = Beacon.Stability.fromString(beaconStabilitySpinner.getSelectedItem().toString());
-        }
-        beacon.placeId = mPlaceIdEditText.getText().toString();
-        Observable<Beacon> observable = mPropertiesMode == Mode.UPDATE ? mDataManager.updateBeacon(mBeacon.beaconName, beacon, hasStatusChanged, beacon.status) : mDataManager.registerBeacon(beacon);
-        mSubscriptions.add(AppObservable.bindFragment(this,
-                observable)
+
+        Observable<Beacon> beaconObservable =  mPropertiesMode == Mode.UPDATE
+                ? mDataManager.updateBeacon(mBeacon.beaconName, beacon, hasStatusChanged, beacon.status)
+                : mDataManager.registerBeacon(beacon);
+
+        mSubscriptions.add(beaconObservable
                 .subscribeOn(mDataManager.getScheduler())
                 .subscribe(new Subscriber<Beacon>() {
                     @Override

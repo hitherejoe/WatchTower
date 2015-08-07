@@ -19,19 +19,19 @@ import com.hitherejoe.watchtower.ui.fragment.AlertsFragment;
 import com.hitherejoe.watchtower.ui.fragment.PropertiesFragment;
 import com.squareup.otto.Subscribe;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import rx.subscriptions.CompositeSubscription;
 
 public class DetailActivity extends BaseActivity {
 
-    @InjectView(R.id.pager_beacon_detail)
+    @Bind(R.id.pager_beacon_detail)
     ViewPager mBeaconDetailViewPager;
 
-    @InjectView(R.id.sliding_tabs)
+    @Bind(R.id.sliding_tabs)
     TabLayout mTabLayout;
 
-    @InjectView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar mToolbar;
 
     private CompositeSubscription mSubscriptions;
@@ -48,7 +48,7 @@ public class DetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         mBeacon = getIntent().getParcelableExtra(EXTRA_BEACON);
         if (mBeacon == null) throw new IllegalArgumentException("Beacon is required!");
         mSubscriptions = new CompositeSubscription();

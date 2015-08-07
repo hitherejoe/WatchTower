@@ -20,30 +20,26 @@ import com.hitherejoe.watchtower.ui.adapter.AlertHolder;
 
 import java.util.Arrays;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import rx.Subscriber;
-import rx.android.app.AppObservable;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
 public class AlertsFragment extends Fragment {
 
-    @InjectView(R.id.recycler_alerts)
+    @Bind(R.id.recycler_alerts)
     RecyclerView mAlertsRecycler;
 
-    @InjectView(R.id.text_no_alerts)
+    @Bind(R.id.text_no_alerts)
     TextView mNoAttachmentsText;
 
-    @InjectView(R.id.progress_indicator)
+    @Bind(R.id.progress_indicator)
     ProgressBar mProgressBar;
 
-    @InjectView(R.id.text_battery_date)
+    @Bind(R.id.text_battery_date)
     TextView mBatteryDateText;
-
-    @InjectView(R.id.text_battery_title)
-    TextView mBatteryTitleText;
 
     private static final String EXTRA_BEACON = "EXTRA_BEACON";
     private static final String TAG = "AlertsFragment";
@@ -75,7 +71,7 @@ public class AlertsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_alerts, container, false);
-        ButterKnife.inject(this, fragmentView);
+        ButterKnife.bind(this, fragmentView);
         setupRecyclerView();
         getDiagnostics();
         return fragmentView;
@@ -93,8 +89,7 @@ public class AlertsFragment extends Fragment {
     }
 
     private void getDiagnostics() {
-        mSubscriptions.add(AppObservable.bindFragment(this,
-                mDataManager.getDiagnostics(mBeacon.beaconName))
+        mSubscriptions.add(mDataManager.getDiagnostics(mBeacon.beaconName)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Subscriber<Diagnostics>() {
                     @Override

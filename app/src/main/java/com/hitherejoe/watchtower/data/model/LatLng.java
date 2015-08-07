@@ -9,6 +9,11 @@ public class LatLng implements Parcelable {
 
     public LatLng() { }
 
+    public LatLng(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     @Override
     public int describeContents() {
         return 0;

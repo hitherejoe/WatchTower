@@ -4,8 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class AdvertisedId implements Parcelable {
-    public Type type;
     public String id;
+    public Type type;
 
     public enum Type {
         TYPE_UNSPECIFIED("Unspecified"),
@@ -36,6 +36,10 @@ public class AdvertisedId implements Parcelable {
 
     }
 
+    public AdvertisedId(String id, Type type) {
+        this.id = id;
+        this.type = type;
+    }
 
     @Override
     public int describeContents() {
