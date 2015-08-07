@@ -64,8 +64,8 @@ public class AddAttachmentActivity extends BaseActivity {
         mBeacon = getIntent().getParcelableExtra(EXTRA_BEACON);
         if (mBeacon == null) throw new IllegalArgumentException("Beacon is required!");
         mSubscriptions = new CompositeSubscription();
-        mDataManager = WatchTowerApplication.get().getDataManager();
-        mSpinnerAdapter = new ArrayAdapter<>(AddAttachmentActivity.this, android.R.layout.simple_spinner_item);
+        mDataManager = WatchTowerApplication.get(this).getDataManager();
+        mSpinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         mNamespaceSpinner.setAdapter(mSpinnerAdapter);
         setupActionBar();
         retrieveNamespaces();
@@ -151,7 +151,8 @@ public class AddAttachmentActivity extends BaseActivity {
                 .subscribe(new Subscriber<Attachment>() {
                     @Override
                     public void onCompleted() {
-                        WatchTowerApplication.get().getBus().post(new BusEvent.AttachmentAdded());
+                        WatchTowerApplication.get(AddAttachmentActivity.this)
+                                .getBus().post(new BusEvent.AttachmentAdded());
                         finish();
                     }
 

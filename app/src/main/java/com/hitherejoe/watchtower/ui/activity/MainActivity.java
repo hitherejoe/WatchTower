@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mSubscriptions = new CompositeSubscription();
-        mDataManager = WatchTowerApplication.get().getDataManager();
+        mDataManager = WatchTowerApplication.get(this).getDataManager();
         mEasyRecycleAdapter = new EasyRecyclerAdapter<>(this, BeaconHolder.class, mBeaconListener);
         setupLayoutViews();
         AccountManager manager = AccountManager.get(this);
@@ -84,7 +84,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
        // } else {
          //   getBeacons();
        // }
-        WatchTowerApplication.get().getBus().register(this);
+        WatchTowerApplication.get(this).getBus().register(this);
 
     }
     private void setupLayoutViews() {
@@ -169,7 +169,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        WatchTowerApplication.get().getBus().unregister(this);
+        WatchTowerApplication.get(this).getBus().unregister(this);
         mSubscriptions.unsubscribe();
     }
 
@@ -254,7 +254,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
 
                     @Override
                     public void onNext(String s) {
-                        WatchTowerApplication.get().getDataManager().getPreferencesHelper().saveToken(s);
+                        WatchTowerApplication.get(MainActivity.this).getDataManager().getPreferencesHelper().saveToken(s);
                         getBeacons();
                     }
                 }));

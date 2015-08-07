@@ -28,7 +28,7 @@ public class DataManager {
     private Bus mEventBus;
 
     public DataManager(Context context, Scheduler scheduler) {
-        mWatchTowerService = new RetrofitHelper().setupProximityApiService();
+        mWatchTowerService = new RetrofitHelper().setupProximityApiService(context);
         mPreferencesHelper = new PreferencesHelper(context);
         mScheduler = scheduler;
         mEventBus = new Bus();

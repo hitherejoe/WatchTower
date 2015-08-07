@@ -54,13 +54,13 @@ public class DetailActivity extends BaseActivity {
         mSubscriptions = new CompositeSubscription();
         setupToolbar();
         setupViewPager();
-        WatchTowerApplication.get().getBus().register(this);
+        WatchTowerApplication.get(this).getBus().register(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        WatchTowerApplication.get().getBus().unregister(this);
+        WatchTowerApplication.get(this).getBus().unregister(this);
         mSubscriptions.unsubscribe();
     }
 

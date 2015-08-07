@@ -116,8 +116,8 @@ public class PropertiesFragment extends Fragment {
         mBeacon = getArguments().getParcelable(EXTRA_BEACON);
         if (mPropertiesMode == Mode.UPDATE && mBeacon == null) throw new IllegalArgumentException("Properties fragment requires a beacon!");
         mSubscriptions = new CompositeSubscription();
-        mDataManager = WatchTowerApplication.get().getDataManager();
-        if (mPropertiesMode == Mode.VIEW) WatchTowerApplication.get().getBus().register(this);
+        mDataManager = WatchTowerApplication.get(getActivity()).getDataManager();
+        if (mPropertiesMode == Mode.VIEW) WatchTowerApplication.get(getActivity()).getBus().register(this);
         setHasOptionsMenu(true);
     }
 
@@ -136,7 +136,7 @@ public class PropertiesFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mPropertiesMode == Mode.VIEW) WatchTowerApplication.get().getBus().unregister(this);
+        if (mPropertiesMode == Mode.VIEW) WatchTowerApplication.get(getActivity()).getBus().unregister(this);
         mSubscriptions.unsubscribe();
     }
 
@@ -291,7 +291,7 @@ public class PropertiesFragment extends Fragment {
                 .subscribe(new Subscriber<Beacon>() {
                     @Override
                     public void onCompleted() {
-                        WatchTowerApplication.get().getBus().post(new BusEvent.BeaconListAmended());
+                        WatchTowerApplication.get(getActivity()).getBus().post(new BusEvent.BeaconListAmended());
                         getActivity().finish();
                     }
 
@@ -308,7 +308,7 @@ public class PropertiesFragment extends Fragment {
                     @Override
                     public void onNext(Beacon beacon) {
                         if (mPropertiesMode == Mode.UPDATE) {
-                            WatchTowerApplication.get().getBus().post(new BusEvent.BeaconUpdated(beacon));
+                            WatchTowerApplication.get(getActivity()).getBus().post(new BusEvent.BeaconUpdated(beacon));
                         }
                     }
                 }));

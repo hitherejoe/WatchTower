@@ -1,6 +1,7 @@
 package com.hitherejoe.watchtower;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.hitherejoe.watchtower.data.DataManager;
 import com.squareup.otto.Bus;
@@ -10,25 +11,17 @@ import timber.log.Timber;
 
 public class WatchTowerApplication extends Application {
 
-    private static WatchTowerApplication sWatchTowerApplication;
     private DataManager mDataManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        sWatchTowerApplication = this;
         mDataManager = new DataManager(this, Schedulers.io());
         if (BuildConfig.DEBUG) Timber.plant(new Timber.DebugTree());
     }
 
-    @Override
-    public void onTerminate() {
-        sWatchTowerApplication = null;
-        super.onTerminate();
-    }
-
-    public static WatchTowerApplication get() {
-        return sWatchTowerApplication;
+    public static WatchTowerApplication get(Context context) {
+        return (WatchTowerApplication) context.getApplicationContext();
     }
 
     public DataManager getDataManager() { return mDataManager; }
