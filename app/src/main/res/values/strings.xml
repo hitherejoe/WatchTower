@@ -41,11 +41,12 @@
 
     <string name="hint_beacon_name">Beacon name</string>
     <string name="hint_advertised_id">Advertised Id</string>
+    <string name="hint_description">Description</string>
     <string name="hint_type">Type</string>
     <string name="hint_status">Status</string>
     <string name="hint_latitude">Latitude</string>
     <string name="hint_longitude">Longitude</string>
-    <string name="hint_description">Description</string>
+    <string name="hint_places_id">Google Places ID</string>
 
 
     <!-- Alerts -->

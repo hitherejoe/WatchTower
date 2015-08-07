@@ -144,7 +144,7 @@
             android:id="@+id/edit_text_place_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_latitude"
+            android:hint="@string/hint_places_id"
             android:inputType="text"/>
 
     </LinearLayout>
