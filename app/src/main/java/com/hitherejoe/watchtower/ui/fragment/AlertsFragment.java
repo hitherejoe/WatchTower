@@ -16,11 +16,13 @@ import com.hitherejoe.watchtower.data.DataManager;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Diagnostics;
 import com.hitherejoe.watchtower.ui.adapter.AlertHolder;
+import com.hitherejoe.watchtower.util.DialogFactory;
 
 import java.util.Arrays;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.RetrofitError;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -113,9 +115,14 @@ public class AlertsFragment extends Fragment {
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable error) {
                         mProgressBar.setVisibility(View.GONE);
-                        Timber.e("There was an error retrieving the beacon diagnostics " + e);
+                        Timber.e("There was an error retrieving the beacon diagnostics " + error);
+                        if (error instanceof RetrofitError) {
+                            DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error);
+                        } else {
+                            DialogFactory.createSimpleErrorDialog(getActivity()).show();
+                        }
                     }
 
                     @Override

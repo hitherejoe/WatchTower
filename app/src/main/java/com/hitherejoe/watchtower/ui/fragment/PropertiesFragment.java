@@ -301,10 +301,7 @@ public class PropertiesFragment extends Fragment {
                         if (error instanceof RetrofitError) {
                             DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error);
                         } else {
-                            DialogFactory.createSimpleOkErrorDialog(
-                                    getActivity(),
-                                    getString(R.string.dialog_error_title),
-                                    getString(R.string.dialog_general_error_Message)).show();
+                            DialogFactory.createSimpleErrorDialog(getActivity()).show();
                         }
                     }
 

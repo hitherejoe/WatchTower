@@ -26,6 +26,14 @@ public class DialogFactory {
         return alertDialog.create();
     }
 
+    public static Dialog createSimpleErrorDialog(Context context) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
+                .setTitle(context.getString(R.string.dialog_error_title))
+                .setMessage(context.getString(R.string.dialog_general_error_Message))
+                .setNeutralButton(R.string.dialog_action_ok, null);
+        return alertDialog.create();
+    }
+
     public static Dialog createRetrofitErrorDialog(Context context, RetrofitError error) {
         String json = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
         ErrorResponse errorResponse = new Gson().fromJson(json, ErrorResponse.class);

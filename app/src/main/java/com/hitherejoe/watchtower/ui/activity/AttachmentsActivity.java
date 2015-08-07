@@ -255,10 +255,7 @@ public class AttachmentsActivity extends BaseActivity {
                     AttachmentsActivity.this,
                     (RetrofitError) error).show();
         } else {
-            DialogFactory.createSimpleOkErrorDialog(
-                    AttachmentsActivity.this,
-                    getString(R.string.dialog_error_title),
-                    getString(R.string.dialog_general_error_Message)).show();
+            DialogFactory.createSimpleErrorDialog(AttachmentsActivity.this).show();
         }
     }
 

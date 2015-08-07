@@ -125,9 +125,14 @@ public class AddAttachmentActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onError(Throwable e) {
+                    public void onError(Throwable error) {
                         mProgressDialog.dismiss();
-                        Timber.e("There was an error retrieving the namespaces " + e);
+                        Timber.e("There was an error retrieving the namespaces " + error);
+                        if (error instanceof RetrofitError) {
+                            DialogFactory.createRetrofitErrorDialog(AddAttachmentActivity.this, (RetrofitError) error);
+                        } else {
+                            DialogFactory.createSimpleErrorDialog(AddAttachmentActivity.this).show();
+                        }
                     }
 
                     @Override
@@ -156,7 +161,7 @@ public class AddAttachmentActivity extends BaseActivity {
                         if (error instanceof RetrofitError) {
                             DialogFactory.createRetrofitErrorDialog(AddAttachmentActivity.this, (RetrofitError) error).show();
                         } else {
-                            DialogFactory.createSimpleOkErrorDialog(AddAttachmentActivity.this, getString(R.string.dialog_error_title), getString(R.string.dialog_general_error_Message)).show();
+                            DialogFactory.createSimpleErrorDialog(AddAttachmentActivity.this).show();
                         }
                     }
 

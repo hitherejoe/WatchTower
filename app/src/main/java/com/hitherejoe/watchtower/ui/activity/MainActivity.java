@@ -28,6 +28,7 @@ import com.hitherejoe.watchtower.data.DataManager;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.ui.adapter.BeaconHolder;
 import com.hitherejoe.watchtower.ui.fragment.PropertiesFragment;
+import com.hitherejoe.watchtower.util.DialogFactory;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit.RetrofitError;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -117,12 +119,15 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        //dialog
-                        // show message in-place of beacons
-                        Timber.e("There was an error retrieving the beacons " + e);
+                    public void onError(Throwable error) {
+                        Timber.e("There was an error retrieving the beacons " + error);
                         mProgressBar.setVisibility(View.GONE);
                         mSwipeRefresh.setRefreshing(false);
+                        if (error instanceof RetrofitError) {
+                            DialogFactory.createRetrofitErrorDialog(MainActivity.this, (RetrofitError) error);
+                        } else {
+                            DialogFactory.createSimpleErrorDialog(MainActivity.this).show();
+                        }
                     }
 
                     @Override
@@ -234,13 +239,16 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                     }
 
                     @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        Log.d("ERROR", "Error getting auth token");
-                        if (e instanceof UserRecoverableAuthException) {
+                    public void onError(Throwable error) {
+                        Timber.e("Error getting auth token: " + error);
+                        if (error instanceof UserRecoverableAuthException) {
                             Timber.w("UserRecoverableAuthException has happen. Opening intent to resolve it");
-                            Intent recover = ((UserRecoverableAuthException) e).getIntent();
+                            Intent recover = ((UserRecoverableAuthException) error).getIntent();
                             startActivityForResult(recover, 1000);
+                        } else if (error instanceof RetrofitError) {
+                            DialogFactory.createRetrofitErrorDialog(MainActivity.this, (RetrofitError) error);
+                        } else {
+                            DialogFactory.createSimpleErrorDialog(MainActivity.this).show();
                         }
                     }
 
