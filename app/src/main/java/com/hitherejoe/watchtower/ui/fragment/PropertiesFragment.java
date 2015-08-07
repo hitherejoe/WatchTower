@@ -2,7 +2,6 @@ package com.hitherejoe.watchtower.ui.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +35,7 @@ import retrofit.RetrofitError;
 import rx.Observable;
 import rx.Subscriber;
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 
 public class PropertiesFragment extends Fragment {
 
@@ -92,7 +92,6 @@ public class PropertiesFragment extends Fragment {
 
     private static final String EXTRA_MODE = "EXTRA_MODE";
     private static final String EXTRA_BEACON = "EXTRA_BEACON";
-    private static final String TAG = "PropertiesFragment";
     private Mode mPropertiesMode;
     private Beacon mBeacon;
     private DataManager mDataManager;
@@ -298,7 +297,7 @@ public class PropertiesFragment extends Fragment {
 
                     @Override
                     public void onError(Throwable error) {
-                        Log.d(TAG, "There was an error : " + error.getMessage());
+                        Timber.d("There was an error : " + error.getMessage());
                         if (error instanceof RetrofitError) {
                             DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error);
                         } else {

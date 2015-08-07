@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +35,7 @@ import retrofit.RetrofitError;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
 public class AttachmentsActivity extends BaseActivity {
@@ -52,7 +52,6 @@ public class AttachmentsActivity extends BaseActivity {
     @Bind(R.id.swipe_refresh)
     SwipeRefreshLayout mSwipeRefresh;
 
-    private static final String TAG = "AttachmentsActivity";
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
     private static final String EXTRA_BEACON = "com.hitherejoe.watchtower.ui.activity.UpdateActivity.EXTRA_BEACON";
@@ -167,7 +166,7 @@ public class AttachmentsActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable error) {
-                        Log.e(TAG, "There was an error deleting all attachments " + error);
+                        Timber.e("There was an error deleting all attachments " + error);
                         mProgressDialog.dismiss();
                         displayErrorDialog(error);
                     }
@@ -196,7 +195,7 @@ public class AttachmentsActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable error) {
-                        Log.e(TAG, "There was an error retrieving the namespaces " + error);
+                        Timber.e("There was an error retrieving the namespaces " + error);
                         mProgressBar.setVisibility(View.GONE);
                         mSwipeRefresh.setRefreshing(false);
                         displayErrorDialog(error);
@@ -230,7 +229,7 @@ public class AttachmentsActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable error) {
-                        Log.e(TAG, "There was an error deleting the attachment " + error);
+                        Timber.e("There was an error deleting the attachment " + error);
                         mProgressDialog.dismiss();
                         displayErrorDialog(error);
                     }

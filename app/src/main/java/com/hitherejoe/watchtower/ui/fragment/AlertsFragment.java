@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +24,7 @@ import butterknife.ButterKnife;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
 public class AlertsFragment extends Fragment {
@@ -42,7 +42,6 @@ public class AlertsFragment extends Fragment {
     TextView mBatteryDateText;
 
     private static final String EXTRA_BEACON = "EXTRA_BEACON";
-    private static final String TAG = "AlertsFragment";
     private Beacon mBeacon;
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
@@ -116,7 +115,7 @@ public class AlertsFragment extends Fragment {
                     @Override
                     public void onError(Throwable e) {
                         mProgressBar.setVisibility(View.GONE);
-                        Log.e(TAG, "There was an error retrieving the beacon diagnostics " + e);
+                        Timber.e("There was an error retrieving the beacon diagnostics " + e);
                     }
 
                     @Override

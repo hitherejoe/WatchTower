@@ -38,6 +38,7 @@ import butterknife.OnClick;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
 public class MainActivity extends BaseActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -59,7 +60,6 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     private static final int REQUEST_CODE_PLAY_SERVICES = 1238;
     private static final int REQUEST_CODE_REGISTER_BEACON = 1538;
 
-    private static final String TAG = "MainActivity";
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
     private EasyRecyclerAdapter<Beacon> mEasyRecycleAdapter;
@@ -120,7 +120,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                     public void onError(Throwable e) {
                         //dialog
                         // show message in-place of beacons
-                        Log.e(TAG, "There was an error retrieving the beacons " + e);
+                        Timber.e("There was an error retrieving the beacons " + e);
                         mProgressBar.setVisibility(View.GONE);
                         mSwipeRefresh.setRefreshing(false);
                     }
@@ -238,7 +238,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
                         e.printStackTrace();
                         Log.d("ERROR", "Error getting auth token");
                         if (e instanceof UserRecoverableAuthException) {
-                            Log.w(TAG, "UserRecoverableAuthException has happen. Opening intent to resolve it");
+                            Timber.w("UserRecoverableAuthException has happen. Opening intent to resolve it");
                             Intent recover = ((UserRecoverableAuthException) e).getIntent();
                             startActivityForResult(recover, 1000);
                         }
@@ -257,7 +257,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         if (connectionResult.hasResolution()) {
             tryToResolveConnectionError(connectionResult);
         } else {
-            Log.d("FAIL", connectionResult.toString());
+            Timber.d("FAIL: " + connectionResult.toString());
         }
     }
 
@@ -265,7 +265,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
         try {
             startIntentSenderForResult(connectionResult.getResolution().getIntentSender(), REQUEST_CODE_PICK_ACCOUNT, null, 0, 0, 0);
         } catch (IntentSender.SendIntentException e) {
-            Log.e(TAG, "Error starting intent to resolve connection issue. " + e.getMessage());
+            Timber.e("Error starting intent to resolve connection issue. " + e.getMessage());
         }
     }
 
