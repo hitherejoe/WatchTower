@@ -184,6 +184,7 @@ public class AttachmentsActivity extends BaseActivity {
                         if (attachmentResponse.attachments != null) {
                             mAttachments.addAll(attachmentResponse.attachments);
                         }
+                        mEasyRecycleAdapter.notifyDataSetChanged();
                     }
                 }));
     }
@@ -210,9 +211,11 @@ public class AttachmentsActivity extends BaseActivity {
 
                     @Override
                     public void onNext(WatchTowerService.AttachmentResponse attachmentResponse) {
+                        mAttachments.clear();
                         if (attachmentResponse.attachments != null) {
                             mAttachments.addAll(attachmentResponse.attachments);
                         }
+                        mEasyRecycleAdapter.notifyDataSetChanged();
                     }
                 }));
     }

@@ -113,11 +113,15 @@ public class AddAttachmentActivity extends BaseActivity {
                     getString(R.string.dialog_error_blank_data)
             ).show();
         } else if (data.contains(" ")) {
-
+            DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_invalid_data)
+            ).show();
         } else if (data.length() > 0) {
             //TODO: For example purposes, allow more data types than text to be used
             Attachment attachment = new Attachment();
-            attachment.data = DataUtils.base64Encode(DataUtils.base64Decode(data.replace(" ", "")));
+            attachment.data = DataUtils.base64Encode(DataUtils.base64Decode(data));
             attachment.namespacedType = mNamespaceSpinner.getSelectedItem() + "/text";
             addAttachment(attachment);
         }
