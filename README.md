@@ -16,6 +16,8 @@ WatchTower is a simple application which was created to test and explore the fun
 - Deleting Single Beacon Attachments
 - Deleting Batch Beacon Attachments by Type
 
+Some features are not very practical within a mobile-app (for example, adding json data to attachments), so these have not been included.
+
 <p align="center">
     <img src="images/device_screenshot.png" alt="Web Launcher"/>
 </p>
