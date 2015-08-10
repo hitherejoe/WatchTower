@@ -9,7 +9,8 @@
 
     <!-- Options Menu -->
 
-    <string name="action_about">About</string>
+    <string name="action_medium">View Medium Article</string>
+    <string name="action_github">View on GitHub</string>
     <string name="action_done">done</string>
     <string name="action_edit">edit</string>
     <string name="action_add_attachment">Add Attachment</string>

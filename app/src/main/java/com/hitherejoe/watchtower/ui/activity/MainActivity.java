@@ -9,6 +9,7 @@ import android.accounts.OperationCanceledException;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -113,7 +114,11 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_about:
+            case R.id.action_medium:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.medium.com")));
+                return true;
+            case R.id.action_github:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/hitherejoe/WatchTower")));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
