@@ -156,6 +156,7 @@ public class AddAttachmentActivity extends BaseActivity {
                 .subscribe(new Subscriber<Attachment>() {
                     @Override
                     public void onCompleted() {
+                        mProgressDialog.dismiss();
                         WatchTowerApplication.get(AddAttachmentActivity.this)
                                 .getComponent().eventBus().post(new BusEvent.AttachmentAdded());
                         finish();
@@ -163,6 +164,7 @@ public class AddAttachmentActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable error) {
+                        mProgressDialog.dismiss();
                         Timber.e("There was a problem adding the attachment " + error);
                         if (error instanceof RetrofitError) {
                             DialogFactory.createRetrofitErrorDialog(
