@@ -66,17 +66,28 @@ public class PropertiesActivityTest {
                 .perform(scrollTo())
                 .check(matches(isDisplayed()));
         onView(withId(R.id.spinner_type)).perform(scrollTo(), click());
-        onData(allOf(is(instanceOf(String.class)), is("Eddystone"))).check(matches(isDisplayed()));
-        onData(allOf(is(instanceOf(String.class)), is("iBeacon"))).check(matches(isDisplayed()));
-        onData(allOf(is(instanceOf(String.class)), is("AltBeacon"))).check(matches(isDisplayed())).perform(click());
+        String[] beaconTypes =
+                InstrumentationRegistry.getTargetContext().getResources().getStringArray(R.array.types);
+        for (String beaconType : beaconTypes) {
+            onData(allOf(is(instanceOf(String.class)), is(beaconType))).check(matches(isDisplayed()));
+            if (beaconTypes[beaconTypes.length - 1].equals(beaconType)) {
+                onData(allOf(is(instanceOf(String.class)), is(beaconType))).perform(click());
+            }
+        }
 
         onView(withId(R.id.text_title_status))
                 .perform(scrollTo())
                 .check(matches(isDisplayed()));
         onView(withId(R.id.spinner_status)).perform(scrollTo(), click());
-        onData(allOf(is(instanceOf(String.class)), is("Active"))).check(matches(isDisplayed()));
-        onData(allOf(is(instanceOf(String.class)), is("Inactive"))).check(matches(isDisplayed()));
-        onData(allOf(is(instanceOf(String.class)), is("Decommissioned"))).check(matches(isDisplayed())).perform(click());
+
+        String[] beaconStatuses =
+                InstrumentationRegistry.getTargetContext().getResources().getStringArray(R.array.statuses);
+        for (String beaconStatus : beaconStatuses) {
+            onData(allOf(is(instanceOf(String.class)), is(beaconStatus))).check(matches(isDisplayed()));
+            if (beaconStatuses[beaconStatuses.length - 1].equals(beaconStatus)) {
+                onData(allOf(is(instanceOf(String.class)), is(beaconStatus))).perform(click());
+            }
+        }
         onView(withId(R.id.text_status_error_message))
                 .check(matches(not(isDisplayed())));
 
@@ -84,11 +95,15 @@ public class PropertiesActivityTest {
                 .perform(scrollTo())
                 .check(matches(isDisplayed()));
         onView(withId(R.id.spinner_stability)).perform(scrollTo(), click());
-        onData(allOf(is(instanceOf(String.class)), is("Stable"))).check(matches(isDisplayed()));
-        onData(allOf(is(instanceOf(String.class)), is("Portable"))).check(matches(isDisplayed()));
-        onData(allOf(is(instanceOf(String.class)), is("Mobile"))).check(matches(isDisplayed()));
-        onData(allOf(is(instanceOf(String.class)), is("Roving"))).check(matches(isDisplayed())).perform(click());
 
+        String[] beaconStabilities =
+                InstrumentationRegistry.getTargetContext().getResources().getStringArray(R.array.stabilities);
+        for (String beaconStability : beaconStabilities) {
+            onData(allOf(is(instanceOf(String.class)), is(beaconStability))).check(matches(isDisplayed()));
+            if (beaconStabilities[beaconStabilities.length - 1].equals(beaconStability)) {
+                onData(allOf(is(instanceOf(String.class)), is(beaconStability))).perform(click());
+            }
+        }
         onView(withId(R.id.text_title_location))
                 .perform(scrollTo())
                 .check(matches(isDisplayed()));
