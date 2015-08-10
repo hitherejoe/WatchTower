@@ -2,12 +2,14 @@ package com.hitherejoe.watchtower;
 
 
 import com.hitherejoe.watchtower.data.DataManager;
+import com.hitherejoe.watchtower.data.local.PreferencesHelper;
 import com.hitherejoe.watchtower.data.model.Attachment;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Namespace;
 import com.hitherejoe.watchtower.data.remote.WatchTowerService;
 import com.hitherejoe.watchtower.util.DefaultConfig;
 import com.hitherejoe.watchtower.util.MockModelsUtil;
+import com.squareup.otto.Bus;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,24 +31,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, emulateSdk = DefaultConfig.EMULATE_SDK)
+@Config(constants = BuildConfig.class, sdk = DefaultConfig.EMULATE_SDK)
 public class DataManagerTest {
 
     private DataManager mDataManager;
-    private WatchTowerService mWatchTowerService;
+    private WatchTowerService mMockWatchTowerService;
 
     @Before
     public void setUp() {
-        mDataManager = new DataManager(RuntimeEnvironment.application, Schedulers.immediate());
-        mWatchTowerService = mock(WatchTowerService.class);
-        mDataManager.setWatchTowerService(mWatchTowerService);
+        mMockWatchTowerService = mock(WatchTowerService.class);
+        Bus mMockBus = mock(Bus.class);
+        PreferencesHelper mPreferencesHelper = new PreferencesHelper(RuntimeEnvironment.application);
+        mDataManager = new DataManager(mMockWatchTowerService,
+                mMockBus,
+                mPreferencesHelper,
+                Schedulers.immediate());
     }
 
     @Test
     public void shouldRegisterBeacon() {
         Beacon unregisteredBeacon = MockModelsUtil.createMockUnregisteredBeacon();
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
-        when(mWatchTowerService.registerBeacon(unregisteredBeacon)).thenReturn(Observable.just(registeredBeacon));
+        when(mMockWatchTowerService.registerBeacon(unregisteredBeacon)).thenReturn(Observable.just(registeredBeacon));
         subscribeAssertingThat(mDataManager.registerBeacon(unregisteredBeacon))
                 .emits(registeredBeacon);
     }
@@ -60,7 +66,7 @@ public class DataManagerTest {
         beaconsResponse.beacons = new ArrayList<>();
         beaconsResponse.beacons.add(registeredBeacon);
         beaconsResponse.beacons.add(registeredBeaconTwo);
-        when(mWatchTowerService.getBeacons()).thenReturn(Observable.just(beaconsResponse));
+        when(mMockWatchTowerService.getBeacons()).thenReturn(Observable.just(beaconsResponse));
 
         subscribeAssertingThat(mDataManager.getBeacons())
                 .emits(beaconsResponse.beacons);
@@ -72,7 +78,7 @@ public class DataManagerTest {
         Beacon updatedBeacon = MockModelsUtil.createMockRegisteredBeacon();
         updatedBeacon.description = "Desc";
 
-        when(mWatchTowerService.updateBeacon(registeredBeacon.beaconName, updatedBeacon))
+        when(mMockWatchTowerService.updateBeacon(registeredBeacon.beaconName, updatedBeacon))
                 .thenReturn(Observable.just(updatedBeacon));
 
         subscribeAssertingThat(mDataManager.updateBeacon(registeredBeacon.beaconName, updatedBeacon, false, Beacon.Status.ACTIVE))
@@ -88,9 +94,9 @@ public class DataManagerTest {
         Beacon decommissionedBeacon = MockModelsUtil.createMockRegisteredBeacon();
         decommissionedBeacon.status = Beacon.Status.DECOMMISSIONED;
 
-        when(mWatchTowerService.decomissionBeacon(decommissionedBeacon.beaconName))
+        when(mMockWatchTowerService.decomissionBeacon(decommissionedBeacon.beaconName))
                 .thenReturn(Observable.just(decommissionedBeacon));
-        when(mWatchTowerService.getBeacon(decommissionedBeacon.beaconName))
+        when(mMockWatchTowerService.getBeacon(decommissionedBeacon.beaconName))
                 .thenReturn(Observable.just(decommissionedBeacon));
         subscribeAssertingThat(mDataManager.setBeaconStatus(decommissionedBeacon, Beacon.Status.DECOMMISSIONED))
                 .emits(decommissionedBeacon);
@@ -98,9 +104,9 @@ public class DataManagerTest {
         Beacon inactiveBeacon = MockModelsUtil.createMockRegisteredBeacon();
         inactiveBeacon.status = Beacon.Status.INACTIVE;
 
-        when(mWatchTowerService.deactivateBeacon(inactiveBeacon.beaconName))
+        when(mMockWatchTowerService.deactivateBeacon(inactiveBeacon.beaconName))
                 .thenReturn(Observable.just(inactiveBeacon));
-        when(mWatchTowerService.getBeacon(inactiveBeacon.beaconName))
+        when(mMockWatchTowerService.getBeacon(inactiveBeacon.beaconName))
                 .thenReturn(Observable.just(inactiveBeacon));
         subscribeAssertingThat(mDataManager.setBeaconStatus(inactiveBeacon, Beacon.Status.INACTIVE))
                 .emits(inactiveBeacon);
@@ -108,9 +114,9 @@ public class DataManagerTest {
         Beacon activeBeacon = MockModelsUtil.createMockRegisteredBeacon();
         activeBeacon.status = Beacon.Status.ACTIVE;
 
-        when(mWatchTowerService.activateBeacon(activeBeacon.beaconName))
+        when(mMockWatchTowerService.activateBeacon(activeBeacon.beaconName))
                 .thenReturn(Observable.just(activeBeacon));
-        when(mWatchTowerService.getBeacon(activeBeacon.beaconName))
+        when(mMockWatchTowerService.getBeacon(activeBeacon.beaconName))
                 .thenReturn(Observable.just(activeBeacon));
         subscribeAssertingThat(mDataManager.setBeaconStatus(activeBeacon, Beacon.Status.ACTIVE))
                 .emits(activeBeacon);
@@ -123,7 +129,7 @@ public class DataManagerTest {
         Attachment registeredAttachment = MockModelsUtil.createMockAttachment();
         registeredAttachment.attachmentName = "attachmentName";
 
-        when(mWatchTowerService.createAttachment(registeredBeacon.beaconName, unRegisteredAttachment))
+        when(mMockWatchTowerService.createAttachment(registeredBeacon.beaconName, unRegisteredAttachment))
                 .thenReturn(Observable.just(registeredAttachment));
         subscribeAssertingThat(mDataManager.createAttachment(registeredBeacon.beaconName, unRegisteredAttachment))
                 .emits(registeredAttachment);
@@ -134,7 +140,7 @@ public class DataManagerTest {
         Attachment registeredAttachment = MockModelsUtil.createMockAttachment();
         registeredAttachment.attachmentName = "attachmentName";
 
-        when(mWatchTowerService.deleteAttachment(registeredAttachment.attachmentName))
+        when(mMockWatchTowerService.deleteAttachment(registeredAttachment.attachmentName))
                 .thenReturn(Observable.<Void>empty());
         subscribeAssertingThat(mDataManager.deleteAttachment(registeredAttachment.attachmentName))
                 .completesSuccessfully();
@@ -154,7 +160,7 @@ public class DataManagerTest {
         WatchTowerService.AttachmentResponse attachmentResponse = new WatchTowerService.AttachmentResponse();
         attachmentResponse.attachments = attachments;
 
-        when(mWatchTowerService.getAttachments(any(String.class), any(String.class)))
+        when(mMockWatchTowerService.getAttachments(any(String.class), any(String.class)))
                 .thenReturn(Observable.just(attachmentResponse));
 
         subscribeAssertingThat(mDataManager.getAttachments(registeredBeacon.beaconName, null))
@@ -170,7 +176,7 @@ public class DataManagerTest {
         WatchTowerService.NamespacesResponse namespacesResponse = new WatchTowerService.NamespacesResponse();
         namespacesResponse.namespaces = namespaces;
 
-        when(mWatchTowerService.getNamespaces())
+        when(mMockWatchTowerService.getNamespaces())
                 .thenReturn(Observable.just(namespacesResponse));
 
         subscribeAssertingThat(mDataManager.getNamespaces())
@@ -181,7 +187,7 @@ public class DataManagerTest {
     public void shouldDeleteBatchAttachments() {
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
 
-        when(mWatchTowerService.deleteBatchAttachments(anyString(), anyString()))
+        when(mMockWatchTowerService.deleteBatchAttachments(anyString(), anyString()))
                 .thenReturn(Observable.<Void>empty());
 
         subscribeAssertingThat(mDataManager.deleteBatchAttachments(registeredBeacon.beaconName, null))
