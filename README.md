@@ -2,7 +2,7 @@ WatchTower
 ===================
 
 <p align="center">
-    ![Web Icon](images/ic_launcher_web.png)
+    <img src="images/ic_launcher_web.png" alt="Web Launcher"/>
 </p>
 
 WatchTower is a simple application which was created to test and explore the functionality of the new [Proximity Beacon API](https://developers.google.com/beacons/proximity/guides). The application can be used to try out:
