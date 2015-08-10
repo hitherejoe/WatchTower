@@ -2,15 +2,22 @@ package com.hitherejoe.watchtower;
 
 
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.hitherejoe.watchtower.data.model.Attachment;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Namespace;
 import com.hitherejoe.watchtower.data.remote.WatchTowerService;
+import com.hitherejoe.watchtower.injection.TestComponentRule;
 import com.hitherejoe.watchtower.ui.activity.AttachmentsActivity;
 import com.hitherejoe.watchtower.util.MockModelsUtil;
-import com.hitherejoe.watchtower.util.BaseTestCase;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,40 +40,39 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
+@RunWith(AndroidJUnit4.class)
+public class AttachmentsActivityTest {
 
-    public AttachmentsActivityTest() {
-        super(AttachmentsActivity.class);
-    }
+    @Rule
+    public final ActivityTestRule<AttachmentsActivity> main =
+            new ActivityTestRule<>(AttachmentsActivity.class, false, false);
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+    @Rule
+    public final TestComponentRule component = new TestComponentRule();
 
-    public void testAttachmentsDisplayed() throws Exception {
+    @Test
+    public void testAttachmentsDisplayed() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         List<Attachment> attachments = MockModelsUtil.createMockListOfAttachments(beacon.beaconName, 10);
         stubMockAttachments(beacon.beaconName, attachments);
 
-        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         checkAttachmentsDisplayOnRecyclerView(attachments);
     }
 
-    public void testDeleteAttachment() throws Exception {
+    @Test
+    public void testDeleteAttachment() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         List<Attachment> attachments = MockModelsUtil.createMockListOfAttachments(beacon.beaconName, 1);
         stubMockAttachments(beacon.beaconName, attachments);
 
-        when(mWatchTowerService.deleteAttachment(attachments.get(0).attachmentName))
+        when(component.getMockWatchTowerService().deleteAttachment(attachments.get(0).attachmentName))
                 .thenReturn(Observable.<Void>empty());
 
-        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withId(R.id.text_delete))
                 .perform(click());
@@ -74,30 +80,30 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
                 .check(matches(isDisplayed()));
     }
 
-    public void testEmptyAttachmentsFeed() throws Exception {
+    @Test
+    public void testEmptyAttachmentsFeed() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         stubMockAttachments(beacon.beaconName, new ArrayList<Attachment>());
-        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withText(R.string.text_no_attachments))
                 .check(matches(isDisplayed()));
     }
 
-    public void testAddAttachmentActivityStarted() throws Exception {
+    @Test
+    public void testAddAttachmentActivityStarted() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         stubMockAttachments(beacon.beaconName, new ArrayList<Attachment>());
         List<Namespace> namespaces = MockModelsUtil.createMockListOfNamespaces(1);
         WatchTowerService.NamespacesResponse namespacesResponse = new WatchTowerService.NamespacesResponse();
         namespacesResponse.namespaces = namespaces;
 
-        when(mWatchTowerService.getNamespaces())
+        when(component.getMockWatchTowerService().getNamespaces())
                 .thenReturn(Observable.just(namespacesResponse));
 
-        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withId(R.id.fab_add))
                 .perform(click());
@@ -105,7 +111,8 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
                 .check(matches(isDisplayed()));
     }
 
-    public void testDeleteAllAttachments() throws Exception {
+    @Test
+    public void testDeleteAllAttachments() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         List<Attachment> attachments = MockModelsUtil.createMockListOfAttachments(beacon.beaconName, 10);
         stubMockAttachments(beacon.beaconName, attachments);
@@ -113,14 +120,13 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
         WatchTowerService.AttachmentResponse attachmentResponse = new WatchTowerService.AttachmentResponse();
         attachmentResponse.attachments = new ArrayList<>();
 
-        when(mWatchTowerService.deleteBatchAttachments(beacon.beaconName, null))
+        when(component.getMockWatchTowerService().deleteBatchAttachments(beacon.beaconName, null))
                 .thenReturn(Observable.<Void>empty());
 
-        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
-        when(mWatchTowerService.getAttachments(beacon.beaconName, null))
+        when(component.getMockWatchTowerService().getAttachments(beacon.beaconName, null))
                 .thenReturn(Observable.just(attachmentResponse));
 
         openContextualActionModeOverflowMenu();
@@ -128,13 +134,14 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
                 .perform(click());
     }
 
-    public void testAddAttachmentValidInput() throws Exception {
+    @Test
+    public void testAddAttachmentValidInput() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         Attachment attachment = MockModelsUtil.createMockAttachment();
         WatchTowerService.NamespacesResponse namespacesResponse = new WatchTowerService.NamespacesResponse();
         namespacesResponse.namespaces = MockModelsUtil.createMockListOfNamespaces(1);
 
-        when(mWatchTowerService.getNamespaces())
+        when(component.getMockWatchTowerService().getNamespaces())
                 .thenReturn(Observable.just(namespacesResponse));
 
         List<Attachment> attachments = MockModelsUtil.createMockListOfAttachments(beacon.beaconName, 10);
@@ -143,15 +150,14 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
         WatchTowerService.AttachmentResponse attachmentResponse = new WatchTowerService.AttachmentResponse();
         attachmentResponse.attachments = new ArrayList<>();
 
-        when(mWatchTowerService.deleteBatchAttachments(beacon.beaconName, null))
+        when(component.getMockWatchTowerService().deleteBatchAttachments(beacon.beaconName, null))
                 .thenReturn(Observable.<Void>empty());
 
-        when(mWatchTowerService.createAttachment(anyString(), any(Attachment.class)))
+        when(component.getMockWatchTowerService().createAttachment(anyString(), any(Attachment.class)))
                 .thenReturn(Observable.just(attachment));
 
-        Intent i = new Intent(AttachmentsActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(AttachmentsActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withId(R.id.fab_add)).perform(click());
 
@@ -180,7 +186,7 @@ public class AttachmentsActivityTest extends BaseTestCase<AttachmentsActivity> {
     private void stubMockAttachments(String beaconName, List<Attachment> mockAttachments) {
         WatchTowerService.AttachmentResponse attachmentResponse = new WatchTowerService.AttachmentResponse();
         attachmentResponse.attachments = mockAttachments;
-        when(mWatchTowerService.getAttachments(beaconName, null))
+        when(component.getMockWatchTowerService().getAttachments(beaconName, null))
                 .thenReturn(Observable.just(attachmentResponse));
     }
 }

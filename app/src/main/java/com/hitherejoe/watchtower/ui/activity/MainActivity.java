@@ -6,7 +6,6 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
@@ -86,7 +84,7 @@ public class MainActivity extends BaseActivity {
         mHasTriedNewAuthToken = false;
         mAccountManager = AccountManager.get(this);
         mSubscriptions = new CompositeSubscription();
-        mDataManager = WatchTowerApplication.get(this).getDataManager();
+        mDataManager = WatchTowerApplication.get(this).getComponent().dataManager();
         mEasyRecycleAdapter = new EasyRecyclerAdapter<>(this, BeaconHolder.class, mBeaconListener);
         setupLayoutViews();
 
@@ -96,13 +94,13 @@ public class MainActivity extends BaseActivity {
             if (checkPlayServices()) chooseAccount();
         }
 
-        WatchTowerApplication.get(this).getBus().register(this);
+        WatchTowerApplication.get(this).getComponent().eventBus().register(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        WatchTowerApplication.get(this).getBus().unregister(this);
+        WatchTowerApplication.get(this).getComponent().eventBus().unregister(this);
         mSubscriptions.unsubscribe();
     }
 

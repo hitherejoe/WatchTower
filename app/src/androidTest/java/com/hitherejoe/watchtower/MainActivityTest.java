@@ -2,17 +2,23 @@ package com.hitherejoe.watchtower;
 
 
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Diagnostics;
 import com.hitherejoe.watchtower.data.remote.WatchTowerService;
+import com.hitherejoe.watchtower.injection.TestComponentRule;
 import com.hitherejoe.watchtower.ui.activity.MainActivity;
 import com.hitherejoe.watchtower.ui.activity.PropertiesActivity;
 import com.hitherejoe.watchtower.ui.fragment.PropertiesFragment;
 import com.hitherejoe.watchtower.util.MockModelsUtil;
-import com.hitherejoe.watchtower.util.BaseTestCase;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 
 import java.util.ArrayList;
@@ -32,34 +38,39 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-public class MainActivityTest extends BaseTestCase<MainActivity> {
+@RunWith(AndroidJUnit4.class)
+public class MainActivityTest {
 
-    public MainActivityTest() {
-        super(MainActivity.class);
-    }
+    @Rule
+    public final ActivityTestRule<MainActivity> main =
+            new ActivityTestRule<>(MainActivity.class, false, false);
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        when(mWatchTowerService.beaconDiagnostics(anyString()))
-                .thenReturn(Observable.<Diagnostics>empty());
-    }
+    @Rule
+    public final TestComponentRule component = new TestComponentRule();
 
-    public void testBeaconsShowAndAreScrollableInFeed() throws Exception {
+    @Test
+    public void testBeaconsShowAndAreScrollableInFeed() {
         List<Beacon> mockBeacons = MockModelsUtil.createMockListOfBeacons(20);
         stubMockPosts(mockBeacons);
-        getActivity();
+        main.launchActivity(null);
 
         checkPostsDisplayOnRecyclerView(mockBeacons);
     }
 
-    public void testClickOnCardAndNavigateToBeaconDetails() throws Exception {
+    @Test
+    public void testClickOnCardAndNavigateToBeaconDetails() {
+
         List<Beacon> mockBeacons = MockModelsUtil.createMockListOfBeacons(1);
         stubMockPosts(mockBeacons);
-        getActivity();
+
+        String beaconName = mockBeacons.get(0).beaconName;
+        Diagnostics diagnostics = MockModelsUtil.createMockDiagnostics(beaconName);
+        when(component.getMockWatchTowerService().beaconDiagnostics(beaconName))
+                .thenReturn(Observable.just(diagnostics));
+
+        main.launchActivity(null);
 
         onView(withText(mockBeacons.get(0).beaconName))
                 .perform(click());
@@ -67,10 +78,17 @@ public class MainActivityTest extends BaseTestCase<MainActivity> {
                 .check(matches(isDisplayed()));
     }
 
-    public void testClickOnViewAndNavigateToBeaconDetails() throws Exception {
+    @Test
+    public void testClickOnViewAndNavigateToBeaconDetails() {
         List<Beacon> mockBeacons = MockModelsUtil.createMockListOfBeacons(1);
         stubMockPosts(mockBeacons);
-        getActivity();
+
+        String beaconName = mockBeacons.get(0).beaconName;
+        Diagnostics diagnostics = MockModelsUtil.createMockDiagnostics(beaconName);
+        when(component.getMockWatchTowerService().beaconDiagnostics(beaconName))
+                .thenReturn(Observable.just(diagnostics));
+
+        main.launchActivity(null);
 
         onView(withText(R.string.text_view))
                 .perform(click());
@@ -78,15 +96,16 @@ public class MainActivityTest extends BaseTestCase<MainActivity> {
                 .check(matches(isDisplayed()));
     }
 
-    public void testClickOnAttachmentsAndNavigateToBeaconAttachments() throws Exception {
+    @Test
+    public void testClickOnAttachmentsAndNavigateToBeaconAttachments() {
         List<Beacon> mockBeacons = MockModelsUtil.createMockListOfBeacons(1);
         stubMockPosts(mockBeacons);
 
         WatchTowerService.AttachmentResponse attachmentResponse = new WatchTowerService.AttachmentResponse();
         attachmentResponse.attachments = MockModelsUtil.createMockListOfAttachments(mockBeacons.get(0).beaconName, 1);
-        when(mWatchTowerService.getAttachments(mockBeacons.get(0).beaconName, null))
+        when(component.getMockWatchTowerService().getAttachments(mockBeacons.get(0).beaconName, null))
                 .thenReturn(Observable.just(attachmentResponse));
-        getActivity();
+        main.launchActivity(null);
 
         onView(withId(R.id.text_attachments))
                 .perform(click());
@@ -94,26 +113,27 @@ public class MainActivityTest extends BaseTestCase<MainActivity> {
                 .check(matches(isDisplayed()));
     }
 
-    public void testEmptyPostsFeed() throws Exception {
+    @Test
+    public void testEmptyPostsFeed() {
         stubMockPosts(new ArrayList<Beacon>());
-        getActivity();
+        main.launchActivity(null);
 
         onView(withText(R.string.text_no_beacons))
                 .check(matches(isDisplayed()));
     }
 
-    public void testRegisterBeaconValidData() throws Exception {
+    @Test
+    public void testRegisterBeaconValidData() {
         Beacon mockBeacon = MockModelsUtil.createMockUnregisteredBeacon();
         mockBeacon.status = Beacon.Status.ACTIVE;
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
 
-        when(mWatchTowerService.registerBeacon(Matchers.any(Beacon.class)))
+        when(component.getMockWatchTowerService().registerBeacon(Matchers.any(Beacon.class)))
                 .thenReturn(Observable.just(registeredBeacon));
 
-        Intent i = new Intent(PropertiesActivity.getStartIntent(getInstrumentation().getContext(), PropertiesFragment.Mode.REGISTER));
-        setActivityIntent(i);
+        Intent i = new Intent(PropertiesActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), PropertiesFragment.Mode.REGISTER));
         stubMockPosts(new ArrayList<Beacon>());
-        getActivity();
+        main.launchActivity(i);
 
         onView(withId(R.id.fab_add)).perform(click());
 
@@ -148,7 +168,7 @@ public class MainActivityTest extends BaseTestCase<MainActivity> {
     private void stubMockPosts(List<Beacon> mockBeacons) {
         WatchTowerService.BeaconsResponse beaconsResponse = new WatchTowerService.BeaconsResponse();
         beaconsResponse.beacons = mockBeacons;
-        when(mWatchTowerService.getBeacons())
+        when(component.getMockWatchTowerService().getBeacons())
                 .thenReturn(Observable.just(beaconsResponse));
     }
 }

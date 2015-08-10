@@ -76,10 +76,10 @@ public class AttachmentsActivity extends BaseActivity {
         mBeacon = getIntent().getParcelableExtra(EXTRA_BEACON);
         if (mBeacon == null) throw new IllegalArgumentException("Beacon is required!");
         mSubscriptions = new CompositeSubscription();
-        mDataManager = WatchTowerApplication.get(this).getDataManager();
+        mDataManager = WatchTowerApplication.get(this).getComponent().dataManager();
         mAttachments = new ArrayList<>();
         mEasyRecycleAdapter = new EasyRecyclerAdapter<>(this, AttachmentHolder.class, mAttachments, mAttachmentListener);
-        WatchTowerApplication.get(this).getBus().register(this);
+        WatchTowerApplication.get(this).getComponent().eventBus().register(this);
         setupViews();
         setupActionBar();
         retrieveAttachments();
@@ -89,7 +89,7 @@ public class AttachmentsActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         mSubscriptions.unsubscribe();
-        WatchTowerApplication.get(this).getBus().unregister(this);
+        WatchTowerApplication.get(this).getComponent().eventBus().unregister(this);
     }
 
     @Override

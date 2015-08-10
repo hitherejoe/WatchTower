@@ -10,12 +10,12 @@ import com.hitherejoe.watchtower.data.local.PreferencesHelper;
 public class AccountUtils {
 
     public static boolean isUserAuthenticated(Context context) {
-        PreferencesHelper preferencesHelper = WatchTowerApplication.get(context).getDataManager().getPreferencesHelper();
+        PreferencesHelper preferencesHelper = WatchTowerApplication.get(context).getComponent().dataManager().getPreferencesHelper();
         return preferencesHelper.getUser() != null && preferencesHelper.getToken() != null;
     }
 
     public static void invalidateToken(Context context) {
-        DataManager dataManager =  WatchTowerApplication.get(context).getDataManager();
+        DataManager dataManager =  WatchTowerApplication.get(context).getComponent().dataManager();
         AccountManager accountManager = AccountManager.get(context);
         accountManager.invalidateAuthToken("com.google", dataManager.getPreferencesHelper().getToken());
         dataManager.getPreferencesHelper().saveToken(null);

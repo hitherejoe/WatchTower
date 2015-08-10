@@ -2,12 +2,19 @@ package com.hitherejoe.watchtower;
 
 
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.remote.WatchTowerService;
+import com.hitherejoe.watchtower.injection.TestComponentRule;
 import com.hitherejoe.watchtower.ui.activity.AddAttachmentActivity;
-import com.hitherejoe.watchtower.util.BaseTestCase;
 import com.hitherejoe.watchtower.util.MockModelsUtil;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import rx.Observable;
 
@@ -23,28 +30,26 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
+@RunWith(AndroidJUnit4.class)
+public class AddAttachmentActivityTest {
 
-public class AddAttachmentActivityTest extends BaseTestCase<AddAttachmentActivity> {
+    @Rule
+    public final ActivityTestRule<AddAttachmentActivity> main =
+            new ActivityTestRule<>(AddAttachmentActivity.class, false, false);
 
-    public AddAttachmentActivityTest() {
-        super(AddAttachmentActivity.class);
-    }
+    @Rule
+    public final TestComponentRule component = new TestComponentRule();
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    public void testActivityDisplayed() throws Exception {
+    @Test
+    public void testActivityDisplayed() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         WatchTowerService.NamespacesResponse namespacesResponse = new WatchTowerService.NamespacesResponse();
         namespacesResponse.namespaces = MockModelsUtil.createMockListOfNamespaces(1);
-        when(mWatchTowerService.getNamespaces())
+        when(component.getMockWatchTowerService().getNamespaces())
                 .thenReturn(Observable.just(namespacesResponse));
 
-        Intent i = new Intent(AddAttachmentActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(AddAttachmentActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withId(R.id.text_namespace))
                 .check(matches(isDisplayed()));
@@ -61,16 +66,16 @@ public class AddAttachmentActivityTest extends BaseTestCase<AddAttachmentActivit
                 .check(matches(isDisplayed()));
     }
 
-    public void testAddAttachmentInvalidInput() throws Exception {
+    @Test
+    public void testAddAttachmentInvalidInput() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         WatchTowerService.NamespacesResponse namespacesResponse = new WatchTowerService.NamespacesResponse();
         namespacesResponse.namespaces = MockModelsUtil.createMockListOfNamespaces(1);
-        when(mWatchTowerService.getNamespaces())
+        when(component.getMockWatchTowerService().getNamespaces())
                 .thenReturn(Observable.just(namespacesResponse));
 
-        Intent i = new Intent(AddAttachmentActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(AddAttachmentActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withId(R.id.text_data_error_message))
                 .check(matches(not(isDisplayed())));

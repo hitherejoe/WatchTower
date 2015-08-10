@@ -2,44 +2,57 @@ package com.hitherejoe.watchtower.data;
 
 import android.content.Context;
 
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.hitherejoe.watchtower.WatchTowerApplication;
 import com.hitherejoe.watchtower.data.local.PreferencesHelper;
 import com.hitherejoe.watchtower.data.model.Attachment;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Diagnostics;
 import com.hitherejoe.watchtower.data.remote.WatchTowerService;
-import com.hitherejoe.watchtower.data.remote.RetrofitHelper;
+import com.hitherejoe.watchtower.injection.component.DaggerDataManagerComponent;
+import com.hitherejoe.watchtower.injection.module.DataManagerModule;
 import com.squareup.otto.Bus;
 
-import java.io.IOException;
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.Subscriber;
 import rx.functions.Func1;
 
 public class DataManager {
 
-    private WatchTowerService mWatchTowerService;
-    private PreferencesHelper mPreferencesHelper;
-    private Scheduler mScheduler;
-    private Bus mEventBus;
+    @Inject protected WatchTowerService mWatchTowerService;
+    @Inject protected PreferencesHelper mPreferencesHelper;
+    @Inject protected Scheduler mSubscribeScheduler;
+    @Inject protected Bus mEventBus;
 
-    public DataManager(Context context, Scheduler scheduler) {
-        mWatchTowerService = new RetrofitHelper().setupProximityApiService(context);
-        mPreferencesHelper = new PreferencesHelper(context);
-        mScheduler = scheduler;
-        mEventBus = new Bus();
+    public DataManager(Context context) {
+        injectDependencies(context);
+    }
+
+    /* This constructor is provided so we can set up a DataManager with mocks from unit test.
+     * At the moment this is not possible to do with Dagger because the Gradle APT plugin doesn't
+     * work for the unit test variant, plus Dagger 2 doesn't provide a nice way of overriding
+     * modules */
+    public DataManager(WatchTowerService watchTowerService,
+                       Bus eventBus,
+                       PreferencesHelper preferencesHelper,
+                       Scheduler subscribeScheduler) {
+        mWatchTowerService = watchTowerService;
+        mEventBus = eventBus;
+        mPreferencesHelper = preferencesHelper;
+        mSubscribeScheduler = subscribeScheduler;
+    }
+
+    protected void injectDependencies(Context context) {
+        DaggerDataManagerComponent.builder()
+                .applicationComponent(WatchTowerApplication.get(context).getComponent())
+                .dataManagerModule(new DataManagerModule(context))
+                .build()
+                .inject(this);
     }
 
     public void setWatchTowerService(WatchTowerService watchTowerService) {
         mWatchTowerService = watchTowerService;
-    }
-
-    public void setScheduler(Scheduler scheduler) {
-        mScheduler = scheduler;
     }
 
     public PreferencesHelper getPreferencesHelper() {
@@ -47,7 +60,7 @@ public class DataManager {
     }
 
     public Scheduler getScheduler() {
-        return mScheduler;
+        return mSubscribeScheduler;
     }
 
     public Bus getBus() {

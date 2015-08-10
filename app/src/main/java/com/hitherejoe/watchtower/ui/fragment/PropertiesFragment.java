@@ -124,9 +124,9 @@ public class PropertiesFragment extends Fragment {
             throw new IllegalArgumentException("Properties fragment requires a beacon!");
         }
         mSubscriptions = new CompositeSubscription();
-        mDataManager = WatchTowerApplication.get(getActivity()).getDataManager();
+        mDataManager = WatchTowerApplication.get(getActivity()).getComponent().dataManager();
         if (mPropertiesMode == Mode.VIEW) {
-            WatchTowerApplication.get(getActivity()).getBus().register(this);
+            WatchTowerApplication.get(getActivity()).getComponent().eventBus().register(this);
         }
         setHasOptionsMenu(true);
     }
@@ -144,7 +144,7 @@ public class PropertiesFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         if (mPropertiesMode == Mode.VIEW) {
-            WatchTowerApplication.get(getActivity()).getBus().unregister(this);
+            WatchTowerApplication.get(getActivity()).getComponent().eventBus().unregister(this);
         }
         mSubscriptions.unsubscribe();
     }
@@ -174,6 +174,8 @@ public class PropertiesFragment extends Fragment {
 
     private void disableFormFields() {
         if (mPropertiesMode == Mode.VIEW) {
+            displayTextFieldAsReadOnly(mBeaconNameEditText);
+            displayTextFieldAsReadOnly(mAdvertisedIdEditText);
             displayTextFieldAsReadOnly(mDescriptionEditText);
             displayTextFieldAsReadOnly(mLatitudeEditText);
             displayTextFieldAsReadOnly(mLongitudeEditText);
@@ -305,7 +307,7 @@ public class PropertiesFragment extends Fragment {
                     public void onCompleted() {
                         mProgressDialog.dismiss();
                         WatchTowerApplication.get(
-                                getActivity()).getBus().post(new BusEvent.BeaconListAmended());
+                                getActivity()).getComponent().eventBus().post(new BusEvent.BeaconListAmended());
                         getActivity().finish();
                     }
 
@@ -325,7 +327,7 @@ public class PropertiesFragment extends Fragment {
                     public void onNext(Beacon beacon) {
                         if (mPropertiesMode == Mode.UPDATE) {
                             WatchTowerApplication.get(getActivity())
-                                    .getBus().post(new BusEvent.BeaconUpdated(beacon));
+                                    .getComponent().eventBus().post(new BusEvent.BeaconUpdated(beacon));
                         }
                     }
                 }));

@@ -67,7 +67,7 @@ public class AlertsFragment extends Fragment {
             throw new IllegalArgumentException("Alerts fragment requires a beacon instance!");
         }
         mSubscriptions = new CompositeSubscription();
-        mDataManager = WatchTowerApplication.get(getActivity()).getDataManager();
+        mDataManager = WatchTowerApplication.get(getActivity()).getComponent().dataManager();
         mEasyRecycleAdapter = new EasyRecyclerAdapter<>(getActivity(), AlertHolder.class);
         setHasOptionsMenu(true);
     }

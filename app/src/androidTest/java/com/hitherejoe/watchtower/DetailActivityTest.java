@@ -2,13 +2,19 @@ package com.hitherejoe.watchtower;
 
 
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Diagnostics;
-import com.hitherejoe.watchtower.ui.activity.AttachmentsActivity;
+import com.hitherejoe.watchtower.injection.TestComponentRule;
 import com.hitherejoe.watchtower.ui.activity.DetailActivity;
 import com.hitherejoe.watchtower.util.MockModelsUtil;
-import com.hitherejoe.watchtower.util.BaseTestCase;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import rx.Observable;
 
@@ -31,18 +37,18 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-public class DetailActivityTest extends BaseTestCase<DetailActivity> {
+@RunWith(AndroidJUnit4.class)
+public class DetailActivityTest {
 
-    public DetailActivityTest() {
-        super(DetailActivity.class);
-    }
+    @Rule
+    public final ActivityTestRule<DetailActivity> main =
+            new ActivityTestRule<>(DetailActivity.class, false, false);
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+    @Rule
+    public final TestComponentRule component = new TestComponentRule();
 
-    public void testNavBarFunctionality() throws Exception {
+    @Test
+    public void testNavBarFunctionality() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
 
         Diagnostics diagnostics = new Diagnostics();
@@ -50,12 +56,11 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         diagnostics.beaconName = "";
         diagnostics.estimatedLowBatteryDate = null;
 
-        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+        when(component.getMockWatchTowerService().beaconDiagnostics(beacon.beaconName))
                 .thenReturn(Observable.just(diagnostics));
 
-        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(DetailActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withText(R.string.fragment_title_properties)).check(matches(isDisplayed()));
         onView(withText(R.string.fragment_title_alerts)).check(matches(isDisplayed()));
@@ -68,7 +73,8 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         onView(withId(R.id.text_battery_title)).check(matches(isDisplayed()));
     }
 
-    public void testNavigateToUpdateBeaconActivity() throws Exception {
+    @Test
+    public void testNavigateToUpdateBeaconActivity() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
 
         Diagnostics diagnostics = new Diagnostics();
@@ -76,18 +82,18 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         diagnostics.beaconName = "";
         diagnostics.estimatedLowBatteryDate = null;
 
-        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+        when(component.getMockWatchTowerService().beaconDiagnostics(beacon.beaconName))
                 .thenReturn(Observable.just(diagnostics));
 
-        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(DetailActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withText(R.string.action_edit)).check(matches(isDisplayed())).perform(click());
         onView(withId(R.id.action_done)).check(matches(isDisplayed()));
     }
 
-    public void testAlertsFragmentContent() throws Exception {
+    @Test
+    public void testAlertsFragmentContent() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
 
         Diagnostics diagnostics = new Diagnostics();
@@ -95,26 +101,25 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         diagnostics.beaconName = "";
         diagnostics.estimatedLowBatteryDate = null;
 
-        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+        when(component.getMockWatchTowerService().beaconDiagnostics(beacon.beaconName))
                 .thenReturn(Observable.just(diagnostics));
-        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(DetailActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withText(R.string.fragment_title_alerts)).perform(click());
         onView(withId(R.id.text_battery_title)).check(matches(isDisplayed()));
         onView(withId(R.id.text_title_alerts)).check(matches(isDisplayed()));
     }
 
+    @Test
     public void testDiagnosticsInformationDisplayed() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         Diagnostics diagnostics = MockModelsUtil.createMockDiagnostics(beacon.beaconName);
 
-        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+        when(component.getMockWatchTowerService().beaconDiagnostics(beacon.beaconName))
                 .thenReturn(Observable.just(diagnostics));
-        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(DetailActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withText(R.string.fragment_title_alerts)).perform(click());
         onView(withText(R.string.text_title_estimated_battery)).check(matches(isDisplayed()));
@@ -124,15 +129,15 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         }
     }
 
+    @Test
     public void testDiagnosticsPlaceholdersDisplayed() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
         Diagnostics diagnostics = MockModelsUtil.createMockEmptyDiagnostics(beacon.beaconName);
 
-        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+        when(component.getMockWatchTowerService().beaconDiagnostics(beacon.beaconName))
                 .thenReturn(Observable.just(diagnostics));
-        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(DetailActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withText(R.string.fragment_title_alerts)).perform(click());
         onView(withText(R.string.text_title_estimated_battery)).check(matches(isDisplayed()));
@@ -140,7 +145,8 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         onView(withText(R.string.text_no_alerts)).check(matches(isDisplayed()));
     }
 
-    public void testViewBeaconCompleteForm() throws Exception {
+    @Test
+    public void testViewBeaconCompleteForm() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
 
         Diagnostics diagnostics = new Diagnostics();
@@ -148,11 +154,10 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         diagnostics.beaconName = "";
         diagnostics.estimatedLowBatteryDate = null;
 
-        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+        when(component.getMockWatchTowerService().beaconDiagnostics(beacon.beaconName))
                 .thenReturn(Observable.just(diagnostics));
-        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(DetailActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withId(R.id.text_title_beacon_name))
                 .check(matches(isDisplayed()));
@@ -213,7 +218,8 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
                 .check(matches(not(isFocusable())));
     }
 
-    public void testViewBeaconIncompleteForm() throws Exception {
+    @Test
+    public void testViewBeaconIncompleteForm() {
         Beacon beacon = MockModelsUtil.createMockIncompleteBeacon();
 
         Diagnostics diagnostics = new Diagnostics();
@@ -221,11 +227,10 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         diagnostics.beaconName = "";
         diagnostics.estimatedLowBatteryDate = null;
 
-        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+        when(component.getMockWatchTowerService().beaconDiagnostics(beacon.beaconName))
                 .thenReturn(Observable.just(diagnostics));
-        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(DetailActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withId(R.id.text_title_beacon_name))
                 .check(matches(isDisplayed()));
@@ -273,7 +278,8 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
                 .check(matches(not(isDisplayed())));
     }
 
-    public void testUpdateBeacon() throws Exception {
+    @Test
+    public void testUpdateBeacon() {
         Beacon beacon = MockModelsUtil.createMockIncompleteBeacon();
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
 
@@ -282,15 +288,14 @@ public class DetailActivityTest extends BaseTestCase<DetailActivity> {
         diagnostics.beaconName = "";
         diagnostics.estimatedLowBatteryDate = null;
 
-        when(mWatchTowerService.beaconDiagnostics(beacon.beaconName))
+        when(component.getMockWatchTowerService().beaconDiagnostics(beacon.beaconName))
                 .thenReturn(Observable.just(diagnostics));
-        when(mWatchTowerService.updateBeacon(anyString(), any(Beacon.class)))
+        when(component.getMockWatchTowerService().updateBeacon(anyString(), any(Beacon.class)))
                 .thenReturn(Observable.just(registeredBeacon));
 
 
-        Intent i = new Intent(DetailActivity.getStartIntent(getInstrumentation().getContext(), beacon));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(DetailActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon));
+        main.launchActivity(i);
 
         onView(withId(R.id.action_edit)).perform(click());
 

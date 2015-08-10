@@ -2,12 +2,18 @@ package com.hitherejoe.watchtower;
 
 
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.ui.activity.PropertiesActivity;
 import com.hitherejoe.watchtower.ui.fragment.PropertiesFragment;
 import com.hitherejoe.watchtower.util.MockModelsUtil;
-import com.hitherejoe.watchtower.util.BaseTestCase;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -23,21 +29,17 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
-public class PropertiesActivityTest extends BaseTestCase<PropertiesActivity> {
+@RunWith(AndroidJUnit4.class)
+public class PropertiesActivityTest {
 
-    public PropertiesActivityTest() {
-        super(PropertiesActivity.class);
-    }
+    @Rule
+    public final ActivityTestRule<PropertiesActivity> main =
+            new ActivityTestRule<>(PropertiesActivity.class, false, false);
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    public void testRegisterBeaconForm() throws Exception {
-        Intent i = new Intent(PropertiesActivity.getStartIntent(getInstrumentation().getContext(), PropertiesFragment.Mode.REGISTER));
-        setActivityIntent(i);
-        getActivity();
+    @Test
+    public void testRegisterBeaconForm() {
+        Intent i = new Intent(PropertiesActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), PropertiesFragment.Mode.REGISTER));
+        main.launchActivity(i);
 
         onView(withId(R.id.text_title_beacon_name))
                 .check(matches(not(isDisplayed())));
@@ -104,10 +106,10 @@ public class PropertiesActivityTest extends BaseTestCase<PropertiesActivity> {
                 .check(matches(isDisplayed()));
     }
 
-    public void testRegisterBeaconInvalidData() throws Exception {
-        Intent i = new Intent(PropertiesActivity.getStartIntent(getInstrumentation().getContext(), PropertiesFragment.Mode.REGISTER));
-        setActivityIntent(i);
-        getActivity();
+
+    public void testRegisterBeaconInvalidData() {
+        Intent i = new Intent(PropertiesActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), PropertiesFragment.Mode.REGISTER));
+        main.launchActivity(i);
 
         onView(withId(R.id.text_advertised_id_error_message))
                 .check(matches(not(isDisplayed())));
@@ -120,11 +122,11 @@ public class PropertiesActivityTest extends BaseTestCase<PropertiesActivity> {
                 .check(matches(isDisplayed()));
     }
 
-    public void testUpdateBeacon() throws Exception {
+    @Test
+    public void testUpdateBeacon() {
         Beacon beacon = MockModelsUtil.createMockRegisteredBeacon();
-        Intent i = new Intent(PropertiesActivity.getStartIntent(getInstrumentation().getContext(), beacon, PropertiesFragment.Mode.UPDATE));
-        setActivityIntent(i);
-        getActivity();
+        Intent i = new Intent(PropertiesActivity.getStartIntent(InstrumentationRegistry.getTargetContext(), beacon, PropertiesFragment.Mode.UPDATE));
+        main.launchActivity(i);
 
         onView(withId(R.id.text_title_beacon_name))
                 .check(matches(isDisplayed()));

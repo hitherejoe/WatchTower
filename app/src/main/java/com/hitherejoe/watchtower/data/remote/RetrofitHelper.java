@@ -11,7 +11,7 @@ import retrofit.converter.GsonConverter;
 
 public class RetrofitHelper {
 
-    public WatchTowerService setupProximityApiService(final Context context) {
+    public WatchTowerService newWatchTowerService(final Context context) {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(WatchTowerService.ENDPOINT)
                 .setLogLevel(RestAdapter.LogLevel.FULL)
@@ -19,7 +19,7 @@ public class RetrofitHelper {
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
                     public void intercept(RequestInterceptor.RequestFacade request) {
-                        String accessToken = WatchTowerApplication.get(context).getDataManager().getPreferencesHelper().getToken();
+                        String accessToken = WatchTowerApplication.get(context).getComponent().dataManager().getPreferencesHelper().getToken();
 
                         if (accessToken != null) {
                             request.addHeader("Authorization", addBearerToken(accessToken));
