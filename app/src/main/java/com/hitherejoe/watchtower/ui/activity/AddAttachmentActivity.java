@@ -106,7 +106,16 @@ public class AddAttachmentActivity extends BaseActivity {
     private void validateAttachmentData() {
         String data = mAttachmentDataText.getText().toString();
         mDataErrorText.setVisibility(data.length() == 0 ? View.VISIBLE : View.GONE);
-        if (data.length() > 0) {
+        if (data.length() == 0) {
+            DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_blank_data)
+            ).show();
+        } else if (data.contains(" ")) {
+
+        } else if (data.length() > 0) {
+            //TODO: For example purposes, allow more data types than text to be used
             Attachment attachment = new Attachment();
             attachment.data = DataUtils.base64Encode(DataUtils.base64Decode(data.replace(" ", "")));
             attachment.namespacedType = mNamespaceSpinner.getSelectedItem() + "/text";

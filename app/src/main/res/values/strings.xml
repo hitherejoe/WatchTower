@@ -87,6 +87,9 @@
     <string name="dialog_error_title">Oops</string>
     <string name="dialog_general_error_Message">There was an error making the request</string>
 
+    <string name="dialog_error_blank_data">Text data cannot be blank</string>
+    <string name="dialog_error_no_attachments">Sorry, there are no attachments to delete!</string>
+
     <string name="progress_dialog_saving_beacon">Saving beacon&#8230;</string>
     <string name="progress_dialog_retrieving_namespaces">Retrieving namespaces&#8230;</string>
     <string name="progress_dialog_adding_attachment">Adding attachment&#8230;</string>

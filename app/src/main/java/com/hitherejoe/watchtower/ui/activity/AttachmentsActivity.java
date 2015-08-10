@@ -102,10 +102,18 @@ public class AttachmentsActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_delete:
-                deleteAttachmentByType();
+                if (mEasyRecycleAdapter.getItemCount() == 0) {
+                    showEmptyAttachmentsDialog();
+                } else {
+                    deleteAttachmentByType();
+                }
                 return true;
             case R.id.action_delete_all:
-                deleteAttachments(null);
+                if (mEasyRecycleAdapter.getItemCount() == 0) {
+                    showEmptyAttachmentsDialog();
+                } else {
+                    deleteAttachments(null);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -245,6 +253,14 @@ public class AttachmentsActivity extends BaseActivity {
             }
         });
         mProgressDialog.show();
+    }
+
+    private void showEmptyAttachmentsDialog() {
+        DialogFactory.createSimpleOkErrorDialog(
+                this,
+                getString(R.string.dialog_error_title),
+                getString(R.string.dialog_error_no_attachments)
+        ).show();
     }
 
     private void handleViewVisibility() {
