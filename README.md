@@ -1,21 +1,24 @@
-Android Boilerplate
+WatchTower
 ===================
 
-After finding no examples online of Espresso / Robolectric setup in Android Studio with the new Unit Testing feature
-(without using a third party plugin) I decided to create this boilerplate project to document the setup. After 
-recreating the same project setup over and over again I decided it was also about time to do so! The project structure is as follows:
+<p align="center">
+    ![Web Icon](images/ic_launcher_web.png)
+</p>
 
-<p align="center"><img src="http://i617.photobucket.com/albums/tt254/joeyerrr/project_structure.png" /></p>
+WatchTower is a simple application which was created to test and explore the functionality of the new [Proximity Beacon API](https://developers.google.com/beacons/proximity/guides). The application can be used to try out:
 
-All ready to go with:
+- Registering Beacons
+- Updating Beacons
+- Viewing Beacons
+- Viewing Beacon Diagnostics
+- Viewing Beacon Attachments
+- Adding Beacon Attachments
+- Deleting Single Beacon Attachments
+- Deleting Batch Beacon Attachments by Type
 
-- Espresso testing
-- Robolectric testing
-- Network requests using retrofit and Rx Java
-- Database management using Rx java and pure SQLite
-- Holders for list items using EasyAdapter
-- Butterknife for easy view injection
-- Picasso for easy image downloading / display
+Note: This was built *quickly* to simply test the APIs functionality. If you come across any bugs please feel free to submit them as an issue, or open a pull request ;)
+
+For further information, please read the [supporting blog post](http://www.medium.com).
 
 Requirements
 ------------
