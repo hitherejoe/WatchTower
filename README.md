@@ -16,6 +16,10 @@ WatchTower is a simple application which was created to test and explore the fun
 - Deleting Single Beacon Attachments
 - Deleting Batch Beacon Attachments by Type
 
+<p align="center">
+    <img src="images/device_screenshot.png" alt="Web Launcher"/>
+</p>
+
 Note: This was built *quickly* to simply test the APIs functionality. If you come across any bugs please feel free to submit them as an issue, or open a pull request ;)
 
 For further information, please read the [supporting blog post](http://www.medium.com).
