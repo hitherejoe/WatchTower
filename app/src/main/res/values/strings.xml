@@ -3,6 +3,9 @@
 
     <string name="label_update">Update</string>
     <string name="label_register">Register</string>
+    <string name="label_attachments">Attachments</string>
+    <string name="label_add_attachment">Add attachment</string>
+    <string name="label_beacon_detail">Beacon detail</string>
 
     <!-- Options Menu -->
 

@@ -27,13 +27,13 @@
         </activity>
 
         <activity android:name=".ui.activity.PropertiesActivity"
-                  android:label="Update"/>
+                  android:label="@string/label_update"/>
         <activity android:name=".ui.activity.AttachmentsActivity"
-                  android:label="Attachments"/>
+                  android:label="@string/label_attachments"/>
         <activity android:name=".ui.activity.AddAttachmentActivity"
-                  android:label="Add Attachment"/>
+                  android:label="@string/label_add_attachment"/>
         <activity android:name=".ui.activity.DetailActivity"
-                  android:label="Beacon Detail"
+                  android:label="@string/label_beacon_detail"
                   android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
