@@ -1,19 +1,21 @@
-<android.support.v4.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/swipe_refresh"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_beacons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:padding="16dp"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"
@@ -38,6 +40,4 @@
             android:src="@drawable/ic_add"
             app:fabSize="normal"/>
 
-    </RelativeLayout>
-
-</android.support.v4.widget.SwipeRefreshLayout>
+</RelativeLayout>
