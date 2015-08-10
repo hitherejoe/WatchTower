@@ -220,12 +220,12 @@ public class PropertiesFragment extends Fragment {
         if (mBeacon.latLng != null) {
             if (mBeacon.latLng.latitude != null) {
                 mLatitudeEditText.setText(String.valueOf(mBeacon.latLng.latitude));
-            } else {
+            } else if (mPropertiesMode == Mode.VIEW) {
                 mLatitudeEditText.setVisibility(View.GONE);
             }
             if (mBeacon.latLng.longitude != null) {
                 mLongitudeEditText.setText(String.valueOf(mBeacon.latLng.longitude));
-            } else {
+            } else if (mPropertiesMode == Mode.VIEW){
                 mLongitudeEditText.setVisibility(View.GONE);
             }
             if (mLatitudeEditText.getVisibility() == View.GONE
