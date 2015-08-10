@@ -249,12 +249,6 @@ public class AttachmentsActivity extends BaseActivity {
 
     private void showProgressDialog(String message) {
         mProgressDialog = DialogFactory.createProgressDialog(this, message);
-        mProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                mSubscriptions.unsubscribe();
-            }
-        });
         mProgressDialog.show();
     }
 
