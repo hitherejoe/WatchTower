@@ -5,6 +5,8 @@ WatchTower
     <img src="images/ic_launcher_web.png" alt="Web Launcher"/>
 </p>
 
+Note: In order to use this app, you'll need to use the Google API Console to register your SHA1 token along with the package name, this app won't work otherwise.
+
 WatchTower is a simple application which was created to test and explore the functionality of the new [Proximity Beacon API](https://developers.google.com/beacons/proximity/guides). The application can be used to try out:
 
 - Registering Beacons

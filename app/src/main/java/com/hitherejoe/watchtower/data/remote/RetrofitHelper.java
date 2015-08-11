@@ -51,7 +51,7 @@ public class RetrofitHelper {
 
         @Override public Throwable handleError(RetrofitError cause) {
             Response response = cause.getResponse();
-            if (response != null && response.getStatus() == 401) {
+            if (response != null && (response.getStatus() == 401 || response.getStatus() == 403)) {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
