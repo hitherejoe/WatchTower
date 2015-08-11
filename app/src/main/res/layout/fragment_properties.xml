@@ -1,8 +1,9 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbarStyle="outsideOverlay"
-            android:clipToPadding="false">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbarStyle="outsideOverlay"
+    android:clipToPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -99,7 +100,6 @@
 
         <TextView
             style="@style/TitleTextStyle"
-            android:layout_height="wrap_content"
             android:id="@+id/text_title_stability"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="2dp"

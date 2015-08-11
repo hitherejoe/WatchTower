@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import retrofit.RetrofitError;
 import retrofit.mime.TypedByteArray;
+import timber.log.Timber;
 
 public class DataUtils {
 
@@ -29,7 +30,7 @@ public class DataUtils {
         try {
             return new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            Timber.e("There was an error decoding the String: " + e);
         }
         return null;
     }

@@ -9,12 +9,10 @@ import android.support.annotation.StringRes;
 import android.text.InputType;
 import android.widget.EditText;
 
-import com.google.gson.Gson;
 import com.hitherejoe.watchtower.R;
 import com.hitherejoe.watchtower.data.model.ErrorResponse;
 
 import retrofit.RetrofitError;
-import retrofit.mime.TypedByteArray;
 
 public class DialogFactory {
 

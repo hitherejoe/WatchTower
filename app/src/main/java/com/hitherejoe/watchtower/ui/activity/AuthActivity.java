@@ -19,6 +19,7 @@ import com.hitherejoe.watchtower.R;
 import com.hitherejoe.watchtower.WatchTowerApplication;
 import com.hitherejoe.watchtower.data.DataManager;
 import com.hitherejoe.watchtower.util.AccountUtils;
+import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.DialogFactory;
 
 import java.io.IOException;
@@ -143,9 +144,25 @@ public class AuthActivity extends BaseActivity {
     }
 
     private void chooseAccount() {
-        Intent intent = AccountPicker.newChooseAccountIntent(null, null,
-                new String[]{ACCOUNT_TYPE}, false, null, null, null, null);
-        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+        if (DataUtils.isNetworkAvailable(this)) {
+            Intent intent = AccountPicker.newChooseAccountIntent(null, null,
+                    new String[]{ACCOUNT_TYPE}, false, null, null, null, null);
+            startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+        } else {
+            Dialog noConnectionDialog = DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            );
+            noConnectionDialog.setCanceledOnTouchOutside(true);
+            noConnectionDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    finish();
+                }
+            });
+            noConnectionDialog.show();
+        }
     }
 
     private void requestToken() {

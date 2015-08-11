@@ -61,7 +61,7 @@ public class DataManagerTest {
     public void shouldGetBeacons() {
         Beacon registeredBeacon = MockModelsUtil.createMockRegisteredBeacon();
         Beacon registeredBeaconTwo = MockModelsUtil.createMockRegisteredBeacon();
-        registeredBeaconTwo.beaconName = "FUCK";
+        registeredBeaconTwo.beaconName = "BeaconName";
         WatchTowerService.BeaconsResponse beaconsResponse = new WatchTowerService.BeaconsResponse();
         beaconsResponse.beacons = new ArrayList<>();
         beaconsResponse.beacons.add(registeredBeacon);

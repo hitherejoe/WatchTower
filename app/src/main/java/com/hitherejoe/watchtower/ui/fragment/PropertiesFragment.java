@@ -190,6 +190,8 @@ public class PropertiesFragment extends Fragment {
             mBeaconStabilitySpinner.setEnabled(false);
             mAdvertisedIdErrorMessage.setVisibility(View.GONE);
             mStatusErrorMessage.setVisibility(View.GONE);
+            mLatitudeErrorMessage.setVisibility(View.GONE);
+            mLongitudeErrorMessage.setVisibility(View.GONE);
         }
         if (mPropertiesMode == Mode.REGISTER) {
             mBeaconNameText.setVisibility(View.GONE);
