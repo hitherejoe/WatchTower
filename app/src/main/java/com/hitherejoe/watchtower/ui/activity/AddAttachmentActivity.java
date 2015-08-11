@@ -121,7 +121,7 @@ public class AddAttachmentActivity extends BaseActivity {
         } else if (data.length() > 0) {
             //TODO: For example purposes, allow more data types than text to be used
             Attachment attachment = new Attachment();
-            attachment.data = DataUtils.base64Encode(DataUtils.base64Decode(data));
+            attachment.data = DataUtils.base64Encode(data.getBytes());
             attachment.namespacedType = mNamespaceSpinner.getSelectedItem() + "/text";
             addAttachment(attachment);
         }

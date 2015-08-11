@@ -126,12 +126,22 @@
             android:hint="@string/hint_latitude"
             android:inputType="numberDecimal"/>
 
+        <TextView
+            style="@style/ErrorTextStyle"
+            android:id="@+id/text_latitude_error_message"
+            android:text="@string/error_message_double_value"/>
+
         <EditText
             android:id="@+id/edit_text_longitude"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_longitude"
             android:inputType="numberDecimal"/>
+
+        <TextView
+            style="@style/ErrorTextStyle"
+            android:id="@+id/text_longitude_error_message"
+            android:text="@string/error_message_double_value"/>
 
         <TextView
             style="@style/TitleTextStyle"

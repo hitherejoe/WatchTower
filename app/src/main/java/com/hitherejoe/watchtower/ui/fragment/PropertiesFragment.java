@@ -92,6 +92,12 @@ public class PropertiesFragment extends Fragment {
     @Bind(R.id.text_status_error_message)
     TextView mStatusErrorMessage;
 
+    @Bind(R.id.text_latitude_error_message)
+    TextView mLatitudeErrorMessage;
+
+    @Bind(R.id.text_longitude_error_message)
+    TextView mLongitudeErrorMessage;
+
     private static final String EXTRA_MODE = "EXTRA_MODE";
     private static final String EXTRA_BEACON = "EXTRA_BEACON";
     private Beacon mBeacon;
@@ -202,7 +208,8 @@ public class PropertiesFragment extends Fragment {
 
     private void populateBeaconForm() {
         mBeaconNameEditText.setText(mBeacon.beaconName);
-        mAdvertisedIdEditText.setText(mBeacon.advertisedId.id);
+        String id = DataUtils.base64DecodeToString(mBeacon.advertisedId.id);
+        if (id != null) mAdvertisedIdEditText.setText(id);
         // If properties are not defined then we hide the corresponding views
         if (mBeacon.placeId != null) {
             mPlaceIdEditText.setText(mBeacon.placeId);
@@ -221,11 +228,13 @@ public class PropertiesFragment extends Fragment {
                 mLatitudeEditText.setText(String.valueOf(mBeacon.latLng.latitude));
             } else if (mPropertiesMode == Mode.VIEW) {
                 mLatitudeEditText.setVisibility(View.GONE);
+                mLatitudeErrorMessage.setVisibility(View.GONE);
             }
             if (mBeacon.latLng.longitude != null) {
                 mLongitudeEditText.setText(String.valueOf(mBeacon.latLng.longitude));
             } else if (mPropertiesMode == Mode.VIEW){
                 mLongitudeEditText.setVisibility(View.GONE);
+                mLongitudeErrorMessage.setVisibility(View.GONE);
             }
             if (mLatitudeEditText.getVisibility() == View.GONE
                     && mLongitudeEditText.getVisibility() == View.GONE) {
@@ -234,7 +243,9 @@ public class PropertiesFragment extends Fragment {
         } else if (mPropertiesMode == Mode.VIEW) {
             mBeaconLocation.setVisibility(View.GONE);
             mLatitudeEditText.setVisibility(View.GONE);
+            mLatitudeErrorMessage.setVisibility(View.GONE);
             mLongitudeEditText.setVisibility(View.GONE);
+            mLongitudeErrorMessage.setVisibility(View.GONE);
         }
 
         ArrayList<String> statuses =
@@ -265,16 +276,39 @@ public class PropertiesFragment extends Fragment {
                 ? View.INVISIBLE : View.VISIBLE);
         mStatusErrorMessage.setVisibility(mBeaconStatusSpinner.getSelectedItemPosition() > 0
                 ? View.INVISIBLE : View.VISIBLE);
-        if (!DataUtils.isStringDoubleValue(mLatitudeEditText.getText().toString())) isValid = false;
-        if (!DataUtils.isStringDoubleValue(mLongitudeEditText.getText().toString())) isValid = false;
+        String latitude = mLatitudeEditText.getText().toString();
+        String longitude = mLongitudeEditText.getText().toString();
+        if (latitude.length() > 0) {
+            if(!DataUtils.isStringDoubleValue(latitude)) {
+                isValid = false;
+                mLatitudeErrorMessage.setVisibility(View.VISIBLE);
+            } else {
+                mLatitudeErrorMessage.setVisibility(View.INVISIBLE);
+            }
+        } else {
+            mLatitudeErrorMessage.setVisibility(View.INVISIBLE);
+        }
+        if (longitude.length() > 0){
+            if (!DataUtils.isStringDoubleValue(longitude)) {
+                isValid = false;
+                mLongitudeErrorMessage.setVisibility(View.VISIBLE);
+            } else {
+                mLongitudeErrorMessage.setVisibility(View.INVISIBLE);
+            }
+        } else {
+            mLongitudeErrorMessage.setVisibility(View.INVISIBLE);
+        }
         if (isValid) saveBeacon(buildBeaconObject());
     }
 
     private Beacon buildBeaconObject() {
-        AdvertisedId advertisedId = new AdvertisedId(mAdvertisedIdEditText.getText().toString(),
+        AdvertisedId advertisedId = new AdvertisedId(DataUtils.base64Encode(mAdvertisedIdEditText.getText().toString().getBytes()),
                 AdvertisedId.Type.fromString(mBeaconTypeSpinner.getSelectedItem().toString()));
-        LatLng latLng = new LatLng(Double.valueOf(mLatitudeEditText.getText().toString()),
-                Double.valueOf(mLongitudeEditText.getText().toString()));
+        String latitude = mLatitudeEditText.getText().toString();
+        String longitude = mLatitudeEditText.getText().toString();
+        LatLng latLng = new LatLng();
+        if (latitude.length() > 0) latLng.latitude = Double.valueOf(latitude);
+        if (longitude.length() > 0) latLng.longitude = Double.valueOf(latitude);
 
         return new Beacon.BeaconBuilder(advertisedId)
                 .status(mBeaconStatusSpinner.getSelectedItemPosition() > 0

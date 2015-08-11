@@ -19,6 +19,7 @@ import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
@@ -130,10 +131,18 @@ public class PropertiesActivityTest {
                 .check(matches(not(isDisplayed())));
         onView(withId(R.id.text_status_error_message))
                 .check(matches(not(isDisplayed())));
+        onView(withId(R.id.edit_text_latitude))
+                .perform(scrollTo(), typeText("f"));
+        onView(withId(R.id.edit_text_longitude))
+                .perform(scrollTo(), typeText("f"));
         onView(withId(R.id.action_done)).perform(click());
         onView(withId(R.id.text_advertised_id_error_message))
                 .check(matches(isDisplayed()));
         onView(withId(R.id.text_status_error_message))
+                .check(matches(isDisplayed()));
+        onView(withId(R.id.text_latitude_error_message))
+                .check(matches(isDisplayed()));
+        onView(withId(R.id.text_longitude_error_message))
                 .check(matches(isDisplayed()));
     }
 
@@ -190,6 +199,10 @@ public class PropertiesActivityTest {
         onView(withText(String.valueOf(beacon.latLng.longitude)))
                 .perform(scrollTo())
                 .check(matches(isDisplayed()));
+        onView(withId(R.id.text_latitude_error_message))
+                .check(matches(not(isDisplayed())));
+        onView(withId(R.id.text_longitude_error_message))
+                .check(matches(not(isDisplayed())));
         onView(withId(R.id.text_title_place_id))
                 .perform(scrollTo())
                 .check(matches(isDisplayed()));

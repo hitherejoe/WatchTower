@@ -7,6 +7,7 @@ import android.util.Base64;
 import com.google.gson.Gson;
 import com.hitherejoe.watchtower.data.model.ErrorResponse;
 
+import java.io.UnsupportedEncodingException;
 import java.util.regex.Pattern;
 
 import retrofit.RetrofitError;
@@ -24,8 +25,13 @@ public class DataUtils {
         return new Gson().fromJson(json, ErrorResponse.class);
     }
 
-    public static byte[] base64Decode(String s) {
-        return Base64.decode(s, Base64.DEFAULT);
+    public static String base64DecodeToString(String s) {
+        try {
+            return new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static String base64Encode(byte[] b) {

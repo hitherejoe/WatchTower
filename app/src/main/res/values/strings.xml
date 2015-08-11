@@ -74,6 +74,7 @@
     <string name="error_message_status">The beacon status cannot be blank</string>
     <string name="error_message_attachment_data">The attachment data cannot be blank</string>
     <string name="error_advertised_id">Advertised Id is required</string>
+    <string name="error_message_double_value">Must be a valid Double</string>
 
     <!-- Dialogs -->
 

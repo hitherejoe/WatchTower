@@ -31,7 +31,8 @@ public class AttachmentHolder extends ItemViewHolder<Attachment> {
     @Override
     public void onSetValues(Attachment attachment, PositionInfo positionInfo) {
         mAttachmentNameText.setText(attachment.attachmentName);
-        mAttachmentDataText.setText(DataUtils.base64Encode(DataUtils.base64Decode(attachment.data)));
+        String data = DataUtils.base64DecodeToString(attachment.data);
+        if (data != null) mAttachmentDataText.setText(data);
     }
 
     @Override
