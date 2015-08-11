@@ -50,8 +50,10 @@ public class MainActivity extends BaseActivity {
     @Bind(R.id.text_no_beacons)
     TextView mNoBeaconsText;
 
-    private static final String URL_MEDIUM_ARTICLE = "http://www.medium.com";
-    private static final String URL_GITHUB_REPOSITORY = "https://github.com/hitherejoe/WatchTower";
+    private static final String URL_MEDIUM_ARTICLE =
+            "https://medium.com/ribot-labs/exploring-google-eddystone-with-the-proximity-beacon-api-bc9256c97e05";
+    private static final String URL_GITHUB_REPOSITORY =
+            "https://github.com/hitherejoe/WatchTower";
     private static final int REQUEST_CODE_REGISTER_BEACON = 1237;
 
     private DataManager mDataManager;
