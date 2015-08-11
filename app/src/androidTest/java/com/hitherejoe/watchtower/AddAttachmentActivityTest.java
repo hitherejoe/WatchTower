@@ -24,6 +24,7 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.instanceOf;
@@ -80,6 +81,10 @@ public class AddAttachmentActivityTest {
         onView(withId(R.id.text_data_error_message))
                 .check(matches(not(isDisplayed())));
         onView(withId(R.id.action_done))
+                .perform(click());
+        onView(withText(R.string.dialog_error_blank_data))
+                .check(matches(isDisplayed()));
+        onView(withText(R.string.dialog_action_ok))
                 .perform(click());
         onView(withId(R.id.text_data_error_message))
                 .check(matches(isDisplayed()));
