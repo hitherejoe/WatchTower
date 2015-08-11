@@ -1,7 +1,6 @@
 package com.hitherejoe.watchtower.ui.fragment;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -335,12 +334,6 @@ public class PropertiesFragment extends Fragment {
 
     private void showProgressDialog() {
         mProgressDialog = DialogFactory.createProgressDialog(getActivity(), R.string.progress_dialog_saving_beacon);
-        mProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                mSubscriptions.unsubscribe();
-            }
-        });
         mProgressDialog.show();
     }
 
