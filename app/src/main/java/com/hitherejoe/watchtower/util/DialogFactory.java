@@ -63,6 +63,15 @@ public class DialogFactory {
         return alertDialog.create();
     }
 
+    public static Dialog createAuthErrorDialog(Context context, DialogInterface.OnClickListener onPositiveClick, DialogInterface.OnClickListener onNegativeClick) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
+                .setTitle(context.getString(R.string.dialog_error_title))
+                .setMessage(context.getString(R.string.dialog_error_unauthorised_response))
+                .setPositiveButton(R.string.dialog_action_authorise, onPositiveClick)
+                .setNegativeButton(R.string.dialog_action_exit, onNegativeClick);
+        return alertDialog.create();
+    }
+
     public static ProgressDialog createProgressDialog(Context context, @StringRes int messageResoruce) {
         return createProgressDialog(context, context.getString(messageResoruce));
     }

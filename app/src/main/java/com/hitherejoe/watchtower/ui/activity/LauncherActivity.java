@@ -3,8 +3,7 @@ package com.hitherejoe.watchtower.ui.activity;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.hitherejoe.watchtower.WatchTowerApplication;
-import com.hitherejoe.watchtower.data.local.PreferencesHelper;
+import com.hitherejoe.watchtower.util.AccountUtils;
 
 public class LauncherActivity extends Activity {
 
@@ -13,13 +12,9 @@ public class LauncherActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PreferencesHelper preferencesHelper = WatchTowerApplication.get(this).getComponent().dataManager().getPreferencesHelper();
-        if (preferencesHelper.getToken() == null) {
-            startActivity(AuthActivity.getStartIntent(this, false));
-            finish();
-        } else {
-            startActivity(MainActivity.getStartIntent(this));
-            finish();
-        }
+        startActivity(AccountUtils.isUserAuthenticated(this)
+                ? MainActivity.getStartIntent(this)
+                : AuthActivity.getStartIntent(this, false));
+        finish();
     }
 }

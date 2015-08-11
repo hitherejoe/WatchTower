@@ -80,6 +80,8 @@
     <string name="dialog_action_ok">OK</string>
     <string name="dialog_action_delete">Delete</string>
     <string name="dialog_action_cancel">Cancel</string>
+    <string name="dialog_action_exit">Exit</string>
+    <string name="dialog_action_authorise">Authorise</string>
 
     <string name="dialog_hint_namespaced_type">Namespaced Type</string>
     <string name="dialog_title_delete">Delete</string>

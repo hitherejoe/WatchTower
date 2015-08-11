@@ -31,12 +31,14 @@ public class AuthActivity extends BaseActivity {
 
     public static final String EXTRA_SHOULD_SHOW_AUTH_MESSAGE =
             "com.hitherejoe.ui.activity.AuthActivity.EXTRA_SHOULD_SHOW_AUTH_MESSAGE";
+    private static final String REQUEST_SCOPE =
+            "oauth2:https://www.googleapis.com/auth/userlocation.beacon.registry";
+    private static final String ACCOUNT_TYPE = "com.google";
+
     private static final int REQUEST_CODE_AUTHORIZATION = 1234;
     private static final int REQUEST_CODE_PLAY_SERVICES = 1235;
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1236;
-    private static final String ACCOUNT_TYPE = "com.google";
-    private static final String REQUEST_SCOPE =
-            "oauth2:https://www.googleapis.com/auth/userlocation.beacon.registry";
+
 
     private DataManager mDataManager;
     private CompositeSubscription mSubscriptions;
@@ -57,17 +59,31 @@ public class AuthActivity extends BaseActivity {
         mDataManager = WatchTowerApplication.get(this).getComponent().dataManager();
 
         if (getIntent().hasExtra(EXTRA_SHOULD_SHOW_AUTH_MESSAGE)) {
-            DialogFactory.createSimpleOkErrorDialog(
+            if (checkPlayServices()) {
+                Dialog authoriseDialog = DialogFactory.createAuthErrorDialog(
                     this,
-                    getString(R.string.dialog_error_title),
-                    getString(R.string.dialog_error_unauthorised_response)
-            ).show();
-        }
-
-        if (AccountUtils.isUserAuthenticated(this)) {
-            startMainActivity();
-        } else {
-            if (checkPlayServices()) chooseAccount();
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            chooseAccount();
+                        }
+                    },
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    }
+                );
+                authoriseDialog.setCanceledOnTouchOutside(true);
+                authoriseDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        finish();
+                    }
+                });
+                authoriseDialog.show();
+            }
         }
     }
 
@@ -105,13 +121,14 @@ public class AuthActivity extends BaseActivity {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                        REQUEST_CODE_PLAY_SERVICES).show();
+                GooglePlayServicesUtil.getErrorDialog(
+                        resultCode, this, REQUEST_CODE_PLAY_SERVICES).show();
             } else {
                 Dialog playServicesDialog = DialogFactory.createSimpleOkErrorDialog(
                         this,
                         getString(R.string.dialog_error_title),
-                        getString(R.string.error_message_play_services));
+                        getString(R.string.error_message_play_services)
+                );
                 playServicesDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
