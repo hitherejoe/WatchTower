@@ -22,7 +22,6 @@ import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.subscriptions.CompositeSubscription;
 
 public class DetailActivity extends BaseActivity {
 
@@ -35,7 +34,6 @@ public class DetailActivity extends BaseActivity {
     @Bind(R.id.pager_beacon_detail)
     ViewPager mBeaconDetailViewPager;
 
-    private CompositeSubscription mSubscriptions;
     private static final String EXTRA_BEACON =
             "com.hitherejoe.watchtower.ui.activity.DetailActivity.EXTRA_BEACON";
     private Beacon mBeacon;
@@ -55,7 +53,6 @@ public class DetailActivity extends BaseActivity {
         if (mBeacon == null) {
             throw new IllegalArgumentException("DetailActivity requires a Beacon object!");
         }
-        mSubscriptions = new CompositeSubscription();
         setupToolbar();
         setupViewPager();
         WatchTowerApplication.get(this).getComponent().eventBus().register(this);
@@ -65,7 +62,6 @@ public class DetailActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         WatchTowerApplication.get(this).getComponent().eventBus().unregister(this);
-        mSubscriptions.unsubscribe();
     }
 
     @Override

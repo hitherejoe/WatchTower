@@ -1,6 +1,8 @@
 package com.hitherejoe.watchtower.ui.activity;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.common.AccountPicker;
 import com.hitherejoe.watchtower.R;
 import com.hitherejoe.watchtower.WatchTowerApplication;
 import com.hitherejoe.watchtower.data.BusEvent;
@@ -20,6 +23,7 @@ import com.hitherejoe.watchtower.data.DataManager;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.ui.adapter.BeaconHolder;
 import com.hitherejoe.watchtower.ui.fragment.PropertiesFragment;
+import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.DialogFactory;
 import com.squareup.otto.Subscribe;
 
@@ -49,6 +53,8 @@ public class MainActivity extends BaseActivity {
     @Bind(R.id.text_no_beacons)
     TextView mNoBeaconsText;
 
+    private static final String URL_MEDIUM_ARTICLE = "http://www.medium.com";
+    private static final String URL_GITHUB_REPOSITORY = "https://github.com/hitherejoe/WatchTower";
     private static final int REQUEST_CODE_REGISTER_BEACON = 1237;
 
     private DataManager mDataManager;
@@ -69,7 +75,6 @@ public class MainActivity extends BaseActivity {
         mEasyRecycleAdapter = new EasyRecyclerAdapter<>(this, BeaconHolder.class, mBeaconListener);
         setupLayoutViews();
         getBeacons();
-
         WatchTowerApplication.get(this).getComponent().eventBus().register(this);
     }
 
@@ -90,10 +95,10 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_medium:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.medium.com")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(URL_MEDIUM_ARTICLE)));
                 return true;
             case R.id.action_github:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/hitherejoe/WatchTower")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(URL_GITHUB_REPOSITORY)));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -124,41 +129,51 @@ public class MainActivity extends BaseActivity {
     }
 
     private void getBeacons() {
-        mEasyRecycleAdapter.setItems(new ArrayList<Beacon>());
-        mSubscriptions.add(mDataManager.getBeacons()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(mDataManager.getScheduler())
-                .subscribe(new Subscriber<Beacon>() {
-                    @Override
-                    public void onCompleted() {
-                        mProgressBar.setVisibility(View.GONE);
-                        mSwipeRefresh.setRefreshing(false);
-                        if (mEasyRecycleAdapter.getItemCount() > 0) {
-                            mBeaconsRecycler.setVisibility(View.VISIBLE);
-                            mNoBeaconsText.setVisibility(View.GONE);
-                        } else {
-                            mBeaconsRecycler.setVisibility(View.GONE);
-                            mNoBeaconsText.setVisibility(View.VISIBLE);
+        if (DataUtils.isNetworkAvailable(this)) {
+            mEasyRecycleAdapter.setItems(new ArrayList<Beacon>());
+            mSubscriptions.add(mDataManager.getBeacons()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(mDataManager.getScheduler())
+                    .subscribe(new Subscriber<Beacon>() {
+                        @Override
+                        public void onCompleted() {
+                            mProgressBar.setVisibility(View.GONE);
+                            mSwipeRefresh.setRefreshing(false);
+                            if (mEasyRecycleAdapter.getItemCount() > 0) {
+                                mBeaconsRecycler.setVisibility(View.VISIBLE);
+                                mNoBeaconsText.setVisibility(View.GONE);
+                            } else {
+                                mBeaconsRecycler.setVisibility(View.GONE);
+                                mNoBeaconsText.setVisibility(View.VISIBLE);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable error) {
-                        Timber.e("There was an error retrieving the beacons " + error);
-                        mProgressBar.setVisibility(View.GONE);
-                        mSwipeRefresh.setRefreshing(false);
-                        if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(MainActivity.this, (RetrofitError) error).show();
-                        } else {
-                            DialogFactory.createSimpleErrorDialog(MainActivity.this).show();
+                        @Override
+                        public void onError(Throwable error) {
+                            Timber.e("There was an error retrieving the beacons " + error);
+                            mProgressBar.setVisibility(View.GONE);
+                            mSwipeRefresh.setRefreshing(false);
+                            if (error instanceof RetrofitError) {
+                                DialogFactory.createRetrofitErrorDialog(MainActivity.this, (RetrofitError) error).show();
+                            } else {
+                                DialogFactory.createSimpleErrorDialog(MainActivity.this).show();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onNext(Beacon beacon) {
-                        mEasyRecycleAdapter.addItem(beacon);
-                    }
-                }));
+                        @Override
+                        public void onNext(Beacon beacon) {
+                            mEasyRecycleAdapter.addItem(beacon);
+                        }
+                    }));
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            mSwipeRefresh.setRefreshing(false);
+            DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            ).show();
+        }
     }
 
     private BeaconHolder.BeaconListener mBeaconListener = new BeaconHolder.BeaconListener() {

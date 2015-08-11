@@ -326,46 +326,54 @@ public class PropertiesFragment extends Fragment {
     }
 
     private void saveBeacon(Beacon beacon) {
-        showProgressDialog();
-        boolean hasStatusChanged = false;
-        if (mPropertiesMode == Mode.UPDATE) hasStatusChanged = beacon.status != mBeacon.status;
+        if (DataUtils.isNetworkAvailable(getActivity())) {
+            showProgressDialog();
+            boolean hasStatusChanged = false;
+            if (mPropertiesMode == Mode.UPDATE) hasStatusChanged = beacon.status != mBeacon.status;
 
-        Observable<Beacon> beaconObservable =  mPropertiesMode == Mode.UPDATE
-                ? mDataManager.updateBeacon(mBeacon.beaconName, beacon, hasStatusChanged, beacon.status)
-                : mDataManager.registerBeacon(beacon);
+            Observable<Beacon> beaconObservable = mPropertiesMode == Mode.UPDATE
+                    ? mDataManager.updateBeacon(mBeacon.beaconName, beacon, hasStatusChanged, beacon.status)
+                    : mDataManager.registerBeacon(beacon);
 
-        mSubscriptions.add(beaconObservable
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(mDataManager.getScheduler())
-                .subscribe(new Subscriber<Beacon>() {
-                    @Override
-                    public void onCompleted() {
-                        mProgressDialog.dismiss();
-                        WatchTowerApplication.get(
-                                getActivity()).getComponent().eventBus().post(new BusEvent.BeaconListAmended());
-                        getActivity().finish();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mProgressDialog.dismiss();
-                        Timber.d("There was an error saving the beacon : " + error.getMessage());
-                        if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(
-                                    getActivity(), (RetrofitError) error).show();
-                        } else {
-                            DialogFactory.createSimpleErrorDialog(getActivity()).show();
+            mSubscriptions.add(beaconObservable
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(mDataManager.getScheduler())
+                    .subscribe(new Subscriber<Beacon>() {
+                        @Override
+                        public void onCompleted() {
+                            mProgressDialog.dismiss();
+                            WatchTowerApplication.get(
+                                    getActivity()).getComponent().eventBus().post(new BusEvent.BeaconListAmended());
+                            getActivity().finish();
                         }
-                    }
 
-                    @Override
-                    public void onNext(Beacon beacon) {
-                        if (mPropertiesMode == Mode.UPDATE) {
-                            WatchTowerApplication.get(getActivity())
-                                    .getComponent().eventBus().post(new BusEvent.BeaconUpdated(beacon));
+                        @Override
+                        public void onError(Throwable error) {
+                            mProgressDialog.dismiss();
+                            Timber.d("There was an error saving the beacon : " + error.getMessage());
+                            if (error instanceof RetrofitError) {
+                                DialogFactory.createRetrofitErrorDialog(
+                                        getActivity(), (RetrofitError) error).show();
+                            } else {
+                                DialogFactory.createSimpleErrorDialog(getActivity()).show();
+                            }
                         }
-                    }
-                }));
+
+                        @Override
+                        public void onNext(Beacon beacon) {
+                            if (mPropertiesMode == Mode.UPDATE) {
+                                WatchTowerApplication.get(getActivity())
+                                        .getComponent().eventBus().post(new BusEvent.BeaconUpdated(beacon));
+                            }
+                        }
+                    }));
+        } else {
+            DialogFactory.createSimpleOkErrorDialog(
+                    getActivity(),
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            ).show();
+        }
     }
 
     private void showProgressDialog() {

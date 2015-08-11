@@ -22,6 +22,7 @@ import com.hitherejoe.watchtower.data.model.Attachment;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.remote.WatchTowerService;
 import com.hitherejoe.watchtower.ui.adapter.AttachmentHolder;
+import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.DialogFactory;
 import com.squareup.otto.Subscribe;
 
@@ -157,93 +158,123 @@ public class AttachmentsActivity extends BaseActivity {
     }
 
     private void deleteAttachments(String type) {
-        showProgressDialog(type == null
-                ? getString(R.string.progress_dialog_deleting_all_attachments)
-                : getString(R.string.progress_dialog_deleting_type_attachments, type));
-        mSubscriptions.add(mDataManager.deleteBatchAttachments(mBeacon.beaconName, type)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(mDataManager.getScheduler())
-                .subscribe(new Subscriber<WatchTowerService.AttachmentResponse>() {
-                    @Override
-                    public void onCompleted() {
-                        mProgressDialog.dismiss();
-                        handleViewVisibility();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        Timber.e("There was an error deleting all attachments " + error);
-                        mProgressDialog.dismiss();
-                        displayErrorDialog(error);
-                    }
-
-                    @Override
-                    public void onNext(WatchTowerService.AttachmentResponse attachmentResponse) {
-                        mAttachments.clear();
-                        if (attachmentResponse.attachments != null) {
-                            mAttachments.addAll(attachmentResponse.attachments);
+        if (DataUtils.isNetworkAvailable(this)) {
+            showProgressDialog(type == null
+                    ? getString(R.string.progress_dialog_deleting_all_attachments)
+                    : getString(R.string.progress_dialog_deleting_type_attachments, type));
+            mSubscriptions.add(mDataManager.deleteBatchAttachments(mBeacon.beaconName, type)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(mDataManager.getScheduler())
+                    .subscribe(new Subscriber<WatchTowerService.AttachmentResponse>() {
+                        @Override
+                        public void onCompleted() {
+                            mProgressDialog.dismiss();
+                            handleViewVisibility();
                         }
-                        mEasyRecycleAdapter.notifyDataSetChanged();
-                    }
-                }));
+
+                        @Override
+                        public void onError(Throwable error) {
+                            Timber.e("There was an error deleting all attachments " + error);
+                            mProgressDialog.dismiss();
+                            displayErrorDialog(error);
+                        }
+
+                        @Override
+                        public void onNext(WatchTowerService.AttachmentResponse attachmentResponse) {
+                            mAttachments.clear();
+                            if (attachmentResponse.attachments != null) {
+                                mAttachments.addAll(attachmentResponse.attachments);
+                            }
+                            mEasyRecycleAdapter.notifyDataSetChanged();
+                        }
+                    }));
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            mSwipeRefresh.setRefreshing(false);
+            DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            ).show();
+        }
     }
 
     private void retrieveAttachments() {
-        mSubscriptions.add(mDataManager.getAttachments(mBeacon.beaconName, null)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(mDataManager.getScheduler())
-                .subscribe(new Subscriber<WatchTowerService.AttachmentResponse>() {
-                    @Override
-                    public void onCompleted() {
-                        mProgressBar.setVisibility(View.GONE);
-                        mSwipeRefresh.setRefreshing(false);
-                        handleViewVisibility();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        Timber.e("There was an error retrieving the namespaces " + error);
-                        mProgressBar.setVisibility(View.GONE);
-                        mSwipeRefresh.setRefreshing(false);
-                        displayErrorDialog(error);
-                    }
-
-                    @Override
-                    public void onNext(WatchTowerService.AttachmentResponse attachmentResponse) {
-                        mAttachments.clear();
-                        if (attachmentResponse.attachments != null) {
-                            mAttachments.addAll(attachmentResponse.attachments);
+        if (DataUtils.isNetworkAvailable(this)) {
+            mSubscriptions.add(mDataManager.getAttachments(mBeacon.beaconName, null)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(mDataManager.getScheduler())
+                    .subscribe(new Subscriber<WatchTowerService.AttachmentResponse>() {
+                        @Override
+                        public void onCompleted() {
+                            mProgressBar.setVisibility(View.GONE);
+                            mSwipeRefresh.setRefreshing(false);
+                            handleViewVisibility();
                         }
-                        mEasyRecycleAdapter.notifyDataSetChanged();
-                    }
-                }));
+
+                        @Override
+                        public void onError(Throwable error) {
+                            Timber.e("There was an error retrieving the namespaces " + error);
+                            mProgressBar.setVisibility(View.GONE);
+                            mSwipeRefresh.setRefreshing(false);
+                            displayErrorDialog(error);
+                        }
+
+                        @Override
+                        public void onNext(WatchTowerService.AttachmentResponse attachmentResponse) {
+                            mAttachments.clear();
+                            if (attachmentResponse.attachments != null) {
+                                mAttachments.addAll(attachmentResponse.attachments);
+                            }
+                            mEasyRecycleAdapter.notifyDataSetChanged();
+                        }
+                    }));
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            mSwipeRefresh.setRefreshing(false);
+            DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            ).show();
+        }
     }
 
     private void deleteAttachment(final Attachment attachment) {
-        showProgressDialog(getString(R.string.progress_dialog_deleting_attachment));
-        mSubscriptions.add(mDataManager.deleteAttachment(attachment.attachmentName)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(mDataManager.getScheduler())
-                .subscribe(new Subscriber<Void>() {
-                    @Override
-                    public void onCompleted() {
-                        mProgressDialog.dismiss();
-                        mAttachments.remove(attachment);
-                        mEasyRecycleAdapter.notifyDataSetChanged();
-                        handleViewVisibility();
-                    }
+        if (DataUtils.isNetworkAvailable(this)) {
+            showProgressDialog(getString(R.string.progress_dialog_deleting_attachment));
+            mSubscriptions.add(mDataManager.deleteAttachment(attachment.attachmentName)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(mDataManager.getScheduler())
+                    .subscribe(new Subscriber<Void>() {
+                        @Override
+                        public void onCompleted() {
+                            mProgressDialog.dismiss();
+                            mAttachments.remove(attachment);
+                            mEasyRecycleAdapter.notifyDataSetChanged();
+                            handleViewVisibility();
+                        }
 
-                    @Override
-                    public void onError(Throwable error) {
-                        Timber.e("There was an error deleting the attachment " + error);
-                        mProgressDialog.dismiss();
-                        displayErrorDialog(error);
-                    }
+                        @Override
+                        public void onError(Throwable error) {
+                            Timber.e("There was an error deleting the attachment " + error);
+                            mProgressDialog.dismiss();
+                            displayErrorDialog(error);
+                        }
 
-                    @Override
-                    public void onNext(Void aVoid) {
-                    }
-                }));
+                        @Override
+                        public void onNext(Void aVoid) {
+                        }
+                    }));
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            mSwipeRefresh.setRefreshing(false);
+            DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            ).show();
+        }
     }
 
     private void showProgressDialog(String message) {

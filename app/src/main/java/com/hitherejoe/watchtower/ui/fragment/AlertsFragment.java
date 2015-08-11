@@ -17,6 +17,7 @@ import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.data.model.Diagnostics;
 import com.hitherejoe.watchtower.data.model.Diagnostics.Alert;
 import com.hitherejoe.watchtower.ui.adapter.AlertHolder;
+import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.DialogFactory;
 
 import java.util.Arrays;
@@ -93,47 +94,56 @@ public class AlertsFragment extends Fragment {
     }
 
     private void getDiagnostics() {
-        mSubscriptions.add(mDataManager.getDiagnostics(mBeacon.beaconName)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(mDataManager.getScheduler())
-                .subscribe(new Subscriber<Diagnostics>() {
-                    @Override
-                    public void onCompleted() {
-                        mProgressBar.setVisibility(View.GONE);
-                        if (mDiagnostics != null) {
-                            if (mDiagnostics.estimatedLowBatteryDate != null) {
-                                mBatteryDateText.setText(mDiagnostics.estimatedLowBatteryDate.buildDate());
-                            } else {
-                                mBatteryDateText.setText(getString(R.string.text_battery_unknown));
-                            }
-                            if (mDiagnostics.alerts != null
-                                    && mDiagnostics.alerts.length > 0) {
-                                mEasyRecycleAdapter.addItems(Arrays.asList(mDiagnostics.alerts));
-                                mNoAttachmentsText.setVisibility(View.GONE);
-                                mAlertsRecycler.setVisibility(View.VISIBLE);
-                            } else {
-                                mNoAttachmentsText.setVisibility(View.VISIBLE);
-                                mAlertsRecycler.setVisibility(View.GONE);
+        if (DataUtils.isNetworkAvailable(getActivity())) {
+            mSubscriptions.add(mDataManager.getDiagnostics(mBeacon.beaconName)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(mDataManager.getScheduler())
+                    .subscribe(new Subscriber<Diagnostics>() {
+                        @Override
+                        public void onCompleted() {
+                            mProgressBar.setVisibility(View.GONE);
+                            if (mDiagnostics != null) {
+                                if (mDiagnostics.estimatedLowBatteryDate != null) {
+                                    mBatteryDateText.setText(mDiagnostics.estimatedLowBatteryDate.buildDate());
+                                } else {
+                                    mBatteryDateText.setText(getString(R.string.text_battery_unknown));
+                                }
+                                if (mDiagnostics.alerts != null
+                                        && mDiagnostics.alerts.length > 0) {
+                                    mEasyRecycleAdapter.addItems(Arrays.asList(mDiagnostics.alerts));
+                                    mNoAttachmentsText.setVisibility(View.GONE);
+                                    mAlertsRecycler.setVisibility(View.VISIBLE);
+                                } else {
+                                    mNoAttachmentsText.setVisibility(View.VISIBLE);
+                                    mAlertsRecycler.setVisibility(View.GONE);
+                                }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onError(Throwable error) {
-                        mProgressBar.setVisibility(View.GONE);
-                        Timber.e("There was an error retrieving beacon diagnostics " + error);
-                        if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error).show();
-                        } else {
-                            DialogFactory.createSimpleErrorDialog(getActivity()).show();
+                        @Override
+                        public void onError(Throwable error) {
+                            mProgressBar.setVisibility(View.GONE);
+                            Timber.e("There was an error retrieving beacon diagnostics " + error);
+                            if (error instanceof RetrofitError) {
+                                DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error).show();
+                            } else {
+                                DialogFactory.createSimpleErrorDialog(getActivity()).show();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onNext(Diagnostics diagnostics) {
-                        mDiagnostics = diagnostics;
-                    }
-                }));
+                        @Override
+                        public void onNext(Diagnostics diagnostics) {
+                            mDiagnostics = diagnostics;
+                        }
+                    }));
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            DialogFactory.createSimpleOkErrorDialog(
+                    getActivity(),
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            ).show();
+        }
     }
 
 }
