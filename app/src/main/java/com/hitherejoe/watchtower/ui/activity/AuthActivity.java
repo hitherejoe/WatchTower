@@ -58,31 +58,11 @@ public class AuthActivity extends BaseActivity {
         mSubscriptions = new CompositeSubscription();
         mDataManager = WatchTowerApplication.get(this).getComponent().dataManager();
 
-        if (getIntent().hasExtra(EXTRA_SHOULD_SHOW_AUTH_MESSAGE)) {
-            if (checkPlayServices()) {
-                Dialog authoriseDialog = DialogFactory.createAuthErrorDialog(
-                    this,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            chooseAccount();
-                        }
-                    },
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    }
-                );
-                authoriseDialog.setCanceledOnTouchOutside(true);
-                authoriseDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        finish();
-                    }
-                });
-                authoriseDialog.show();
+        if (checkPlayServices()) {
+            if (getIntent().getBooleanExtra(EXTRA_SHOULD_SHOW_AUTH_MESSAGE, false)) {
+                showErrorDialog(getString(R.string.dialog_error_unauthorised_response));
+            } else {
+                chooseAccount();
             }
         }
     }
@@ -105,16 +85,36 @@ public class AuthActivity extends BaseActivity {
                 AccountUtils.invalidateToken(this);
                 requestToken();
             } else {
-                Dialog dialog = DialogFactory.createSimpleErrorDialog(this);
-                dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                showErrorDialog(getString(R.string.dialog_error_account_chooser));
+            }
+        } else {
+            showErrorDialog(getString(R.string.dialog_error_account_chooser));
+        }
+    }
+
+    private void showErrorDialog(String message) {
+        Dialog dialog = DialogFactory.createAuthErrorDialog(this,
+                message,
+                new DialogInterface.OnClickListener() {
                     @Override
-                    public void onDismiss(DialogInterface dialog) {
+                    public void onClick(DialogInterface dialog, int which) {
+                        chooseAccount();
+                    }
+                },
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
                         finish();
                     }
                 });
-                dialog.show();
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
             }
-        }
+        });
+        dialog.show();
     }
 
     private boolean checkPlayServices() {

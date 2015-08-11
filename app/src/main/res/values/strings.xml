@@ -90,6 +90,7 @@
     <string name="dialog_error_title">Oops</string>
     <string name="dialog_general_error_Message">There was an error making the request</string>
     <string name="dialog_error_unauthorised_response">There was an error authorising the request, please connect again</string>
+    <string name="dialog_error_account_chooser">Sorry, but you can\'t use this app without connecting an account!</string>
 
     <string name="dialog_error_blank_data">Text data cannot be blank!</string>
     <string name="dialog_error_invalid_data">Text data cannot contain spaces!</string>
