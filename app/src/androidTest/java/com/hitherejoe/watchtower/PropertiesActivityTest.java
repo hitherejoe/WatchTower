@@ -9,6 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.hitherejoe.watchtower.data.model.Beacon;
 import com.hitherejoe.watchtower.ui.activity.PropertiesActivity;
 import com.hitherejoe.watchtower.ui.fragment.PropertiesFragment;
+import com.hitherejoe.watchtower.util.DataUtils;
 import com.hitherejoe.watchtower.util.MockModelsUtil;
 
 import org.junit.Rule;
@@ -160,7 +161,7 @@ public class PropertiesActivityTest {
 
         onView(withId(R.id.text_title_advertised_id))
                 .check(matches(isDisplayed()));
-        onView(withText(beacon.advertisedId.id))
+        onView(withText(DataUtils.base64DecodeToString(beacon.advertisedId.id)))
                 .check(matches(isDisplayed()))
                 .check(matches(not(isFocusable())));
         onView(withId(R.id.text_advertised_id_error_message))
