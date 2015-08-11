@@ -1,5 +1,6 @@
 package com.hitherejoe.watchtower.ui.activity;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -70,7 +71,7 @@ public class AddAttachmentActivity extends BaseActivity {
         mSpinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         mNamespaceSpinner.setAdapter(mSpinnerAdapter);
         setupActionBar();
-        retrieveNamespaces();
+        getNameSpacesIfNetworkAvailable();
     }
 
     @Override
@@ -100,6 +101,26 @@ public class AddAttachmentActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    private void getNameSpacesIfNetworkAvailable() {
+        if (DataUtils.isNetworkAvailable(this)) {
+            retrieveNamespaces();
+        } else {
+            Dialog dialog = DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            );
+            dialog.setCanceledOnTouchOutside(true);
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    finish();
+                }
+            });
+            dialog.show();
         }
     }
 
@@ -162,35 +183,44 @@ public class AddAttachmentActivity extends BaseActivity {
     }
 
     private void addAttachment(Attachment attachment) {
-        showProgressDialog(R.string.progress_dialog_adding_attachment);
-        mSubscriptions.add(mDataManager.createAttachment(mBeacon.beaconName, attachment)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(mDataManager.getScheduler())
-                .subscribe(new Subscriber<Attachment>() {
-                    @Override
-                    public void onCompleted() {
-                        mProgressDialog.dismiss();
-                        WatchTowerApplication.get(AddAttachmentActivity.this)
-                                .getComponent().eventBus().post(new BusEvent.AttachmentAdded());
-                        finish();
-                    }
-
-                    @Override
-                    public void onError(Throwable error) {
-                        mProgressDialog.dismiss();
-                        Timber.e("There was a problem adding the attachment " + error);
-                        if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(
-                                    AddAttachmentActivity.this, (RetrofitError) error).show();
-                        } else {
-                            DialogFactory.createSimpleErrorDialog(
-                                    AddAttachmentActivity.this).show();
+        if (DataUtils.isNetworkAvailable(this)) {
+            showProgressDialog(R.string.progress_dialog_adding_attachment);
+            mSubscriptions.add(mDataManager.createAttachment(mBeacon.beaconName, attachment)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(mDataManager.getScheduler())
+                    .subscribe(new Subscriber<Attachment>() {
+                        @Override
+                        public void onCompleted() {
+                            mProgressDialog.dismiss();
+                            WatchTowerApplication.get(AddAttachmentActivity.this)
+                                    .getComponent().eventBus().post(new BusEvent.AttachmentAdded());
+                            finish();
                         }
-                    }
 
-                    @Override
-                    public void onNext(Attachment attachment) { }
-                }));
+                        @Override
+                        public void onError(Throwable error) {
+                            mProgressDialog.dismiss();
+                            Timber.e("There was a problem adding the attachment " + error);
+                            if (error instanceof RetrofitError) {
+                                DialogFactory.createRetrofitErrorDialog(
+                                        AddAttachmentActivity.this, (RetrofitError) error).show();
+                            } else {
+                                DialogFactory.createSimpleErrorDialog(
+                                        AddAttachmentActivity.this).show();
+                            }
+                        }
+
+                        @Override
+                        public void onNext(Attachment attachment) {
+                        }
+                    }));
+        } else {
+            DialogFactory.createSimpleOkErrorDialog(
+                    this,
+                    getString(R.string.dialog_error_title),
+                    getString(R.string.dialog_error_no_connection)
+            ).show();
+        }
     }
 
     private void showProgressDialog(int messageResourceId) {

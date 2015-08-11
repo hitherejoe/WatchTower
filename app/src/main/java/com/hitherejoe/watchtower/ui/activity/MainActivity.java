@@ -1,8 +1,6 @@
 package com.hitherejoe.watchtower.ui.activity;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,7 +13,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.common.AccountPicker;
 import com.hitherejoe.watchtower.R;
 import com.hitherejoe.watchtower.WatchTowerApplication;
 import com.hitherejoe.watchtower.data.BusEvent;
