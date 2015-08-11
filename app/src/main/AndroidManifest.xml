@@ -17,24 +17,28 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.activity.MainActivity"
-            android:label="@string/app_name" >
+            android:name=".ui.activity.LauncherActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".ui.activity.AuthActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.activity.MainActivity"
+                  android:label="@string/app_name" />
         <activity android:name=".ui.activity.PropertiesActivity"
-                  android:label="@string/label_update"/>
+                  android:label="@string/label_update" />
         <activity android:name=".ui.activity.AttachmentsActivity"
-                  android:label="@string/label_attachments"/>
+                  android:label="@string/label_attachments" />
         <activity android:name=".ui.activity.AddAttachmentActivity"
-                  android:label="@string/label_add_attachment"/>
+                  android:label="@string/label_add_attachment" />
         <activity android:name=".ui.activity.DetailActivity"
                   android:label="@string/label_beacon_detail"
-                  android:theme="@style/AppTheme.NoActionBar"/>
+                  android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

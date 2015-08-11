@@ -16,6 +16,7 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.Subscriber;
 import rx.functions.Func1;
 
 public class DataManager {
@@ -51,10 +52,6 @@ public class DataManager {
                 .inject(this);
     }
 
-    public void setWatchTowerService(WatchTowerService watchTowerService) {
-        mWatchTowerService = watchTowerService;
-    }
-
     public PreferencesHelper getPreferencesHelper() {
         return mPreferencesHelper;
     }
@@ -65,6 +62,16 @@ public class DataManager {
 
     public Bus getBus() {
         return mEventBus;
+    }
+
+    public Observable<Void> clearUserCredentials() {
+        return Observable.create(new Observable.OnSubscribe<Void>() {
+            @Override
+            public void call(Subscriber<? super Void> subscriber) {
+                mPreferencesHelper.clear();
+                subscriber.onCompleted();
+            }
+        });
     }
 
     public Observable<Beacon> registerBeacon(Beacon beacon) {

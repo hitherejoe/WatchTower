@@ -145,7 +145,7 @@ public class AddAttachmentActivity extends BaseActivity {
                         Timber.e("There was an error retrieving the namespaces " + error);
                         if (error instanceof RetrofitError) {
                             DialogFactory.createRetrofitErrorDialog(
-                                    AddAttachmentActivity.this, (RetrofitError) error);
+                                    AddAttachmentActivity.this, (RetrofitError) error).show();
                         } else {
                             DialogFactory.createSimpleErrorDialog(
                                     AddAttachmentActivity.this).show();

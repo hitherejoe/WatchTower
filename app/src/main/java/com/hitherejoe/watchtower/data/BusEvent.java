@@ -13,4 +13,5 @@ public class BusEvent {
 
     }
     public static class AttachmentAdded { }
+    public static class AuthenticationError { }
 }

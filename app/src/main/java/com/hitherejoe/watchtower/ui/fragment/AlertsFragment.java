@@ -123,7 +123,7 @@ public class AlertsFragment extends Fragment {
                         mProgressBar.setVisibility(View.GONE);
                         Timber.e("There was an error retrieving beacon diagnostics " + error);
                         if (error instanceof RetrofitError) {
-                            DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error);
+                            DialogFactory.createRetrofitErrorDialog(getActivity(), (RetrofitError) error).show();
                         } else {
                             DialogFactory.createSimpleErrorDialog(getActivity()).show();
                         }

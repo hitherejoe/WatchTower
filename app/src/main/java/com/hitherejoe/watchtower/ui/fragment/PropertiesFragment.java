@@ -317,7 +317,7 @@ public class PropertiesFragment extends Fragment {
                         Timber.d("There was an error saving the beacon : " + error.getMessage());
                         if (error instanceof RetrofitError) {
                             DialogFactory.createRetrofitErrorDialog(
-                                    getActivity(), (RetrofitError) error);
+                                    getActivity(), (RetrofitError) error).show();
                         } else {
                             DialogFactory.createSimpleErrorDialog(getActivity()).show();
                         }
