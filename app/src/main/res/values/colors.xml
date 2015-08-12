@@ -10,4 +10,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
     <color name="light_grey">#D4D4D4</color>
+    <color name="white">#FFFFFF</color>
+    <color name="super_light_grey">#FAFAFA</color>
+    <color name="line_grey">#D7D7D7</color>
 </resources>

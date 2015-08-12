@@ -3,7 +3,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="160dp"
+    android:layout_height="wrap_content"
     android:layout_marginTop="2dp"
     android:layout_marginBottom="2dp"
     card_view:cardCornerRadius="2dp"
@@ -12,13 +12,13 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/text_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:padding="16dp"
             android:textStyle="bold"/>
 
         <TextView
@@ -26,14 +26,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/text_name"
-            android:layout_above="@+id/text_delete"
-            android:layout_marginTop="6dp"/>
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp"/>
 
         <TextView
             style="@style/CardButtonTextStyle"
             android:id="@+id/text_delete"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_below="@+id/text_data"
+            android:background="@drawable/touchable_background_white"
             android:textColor="@android:color/holo_red_light"
             android:text="@string/text_delete" />
 

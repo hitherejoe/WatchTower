@@ -3,7 +3,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="160dp"
+    android:layout_height="wrap_content"
     android:layout_marginTop="2dp"
     android:layout_marginBottom="2dp"
     card_view:cardCornerRadius="2dp"
@@ -11,63 +11,77 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
-        <ImageView
-            android:id="@+id/image_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"/>
-
-        <ImageView
-            android:id="@+id/image_battery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="16dp"/>
-
-        <TextView
-            android:id="@+id/text_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/image_status"
-            android:layout_alignTop="@id/image_status"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="4dp"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/text_identifier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/text_type"
-            android:layout_alignLeft="@id/text_type"
-            android:layout_marginRight="16dp"/>
-
-        <View
+        <RelativeLayout
+            android:id="@+id/container_details"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_above="@+id/text_view"
-            android:background="@color/light_grey"/>
+            android:layout_height="wrap_content"
+            android:background="@drawable/touchable_background_white">
 
-        <TextView
-            style="@style/CardButtonTextStyle"
-            android:id="@+id/text_view"
-            android:layout_alignParentBottom="true"
-            android:textColor="@color/primary_text"
-            android:text="@string/text_view"/>
+            <ImageView
+                android:id="@+id/image_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"/>
 
-        <TextView
-            style="@style/CardButtonTextStyle"
-            android:id="@+id/text_attachments"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/text_view"
-            android:textColor="@color/accent"
-            android:visibility="visible"
-            android:text="@string/text_attachments"/>
+            <TextView
+                android:id="@+id/text_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/image_status"
+                android:layout_alignTop="@id/image_status"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="4dp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/text_identifier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_type"
+                android:layout_alignLeft="@id/text_type"
+                android:layout_marginBottom="24dp"
+                android:layout_marginRight="16dp"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/container_details"
+            android:background="@color/white">
+
+            <View
+                android:id="@+id/seperator_line"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentTop="true"
+                android:background="@color/light_grey"/>
+
+            <TextView
+                style="@style/CardButtonTextStyle"
+                android:id="@+id/text_view"
+                android:layout_below="@+id/seperator_line"
+                android:background="@drawable/touchable_background_white"
+                android:textColor="@color/primary_text"
+                android:text="@string/text_view"/>
+
+            <TextView
+                style="@style/CardButtonTextStyle"
+                android:id="@+id/text_attachments"
+                android:layout_below="@+id/seperator_line"
+                android:layout_toRightOf="@id/text_view"
+                android:background="@drawable/touchable_background_white"
+                android:textColor="@color/accent"
+                android:text="@string/text_attachments"/>
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
