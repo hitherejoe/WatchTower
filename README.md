@@ -26,7 +26,7 @@ Some features are not very practical within a mobile-app (for example, adding js
 
 Note: This was built *quickly* to simply test the APIs functionality. If you come across any bugs please feel free to submit them as an issue, or open a pull request ;)
 
-For further information, please read the [supporting blog post](http://www.medium.com).
+For further information, please read the [supporting blog post](https://medium.com/ribot-labs/exploring-google-eddystone-with-the-proximity-beacon-api-bc9256c97e05).
 
 Requirements
 ------------
