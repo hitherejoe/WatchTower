@@ -3,8 +3,6 @@ WatchTower
 
 <p align="center">
     <img src="images/ic_launcher_web.png" alt="Web Launcher"/>
-    <br/>
-    Image credit: [Stéphanie Rusch](https://thenounproject.com/BeezkOt/)
 </p>
 
 Note: In order to use this app, you'll need to use the Google API Console to register your SHA1 token along with the package name, this app won't work otherwise.
@@ -65,8 +63,9 @@ Attributions
 ------------
 
 Thanks to the following for icons off of Noun Project:
-
-[Stéphanie Rusch](https://thenounproject.com/BeezkOt)
-[Stéphanie Rusch](https://thenounproject.com/BeezkOt)
-[Stéphanie Rusch](https://thenounproject.com/BeezkOt)
-[Stéphanie Rusch](https://thenounproject.com/BeezkOt)
+<br/>
+[Stéphanie Rusch](https://thenounproject.com/BeezkOt) - Beacon Icon <br/>
+[Abraham](https://thenounproject.com/gorilladigital) - Cloud Icon<br/>
+[S.Shohei](https://thenounproject.com/shohei909) - Battery Icon<br/>
+[Juergen Bauer](https://thenounproject.com/Juergen) - Alert Icon<br/>
+[Pham Thi Dieu Linh](https://thenounproject.com/phdieuli) - Attachment Icon<br/>
