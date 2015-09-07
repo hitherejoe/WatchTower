@@ -3,6 +3,8 @@ WatchTower
 
 <p align="center">
     <img src="images/ic_launcher_web.png" alt="Web Launcher"/>
+    <br/>
+    Image credit: [Stéphanie Rusch](https://thenounproject.com/BeezkOt/)
 </p>
 
 Note: In order to use this app, you'll need to use the Google API Console to register your SHA1 token along with the package name, this app won't work otherwise.
@@ -58,3 +60,13 @@ To run **unit** tests on your machine using [Robolectric] (http://robolectric.or
 To run **automated** tests on connected devices:
 
     ./gradlew connectedAndroidTest
+    
+Attributions
+------------
+
+Thanks to the following for icons off of Noun Project:
+
+[Stéphanie Rusch](https://thenounproject.com/BeezkOt)
+[Stéphanie Rusch](https://thenounproject.com/BeezkOt)
+[Stéphanie Rusch](https://thenounproject.com/BeezkOt)
+[Stéphanie Rusch](https://thenounproject.com/BeezkOt)
